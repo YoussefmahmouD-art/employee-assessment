@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة تقييم الموظفين | بوابة الاختبار</title>
+    <!-- Google Fonts Cairo -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Cairo', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            800: '#1e40af',
+                            900: '#1e3a8a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Cairo', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between selection:bg-brand-500 selection:text-white">
+
+    <!-- Header Navigation -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+        <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center space-x-3 space-x-reverse">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-700 to-brand-500 flex items-center justify-center text-white shadow-md shadow-brand-500/20">
+                    <i data-lucide="award" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold text-slate-900 leading-tight">منصة الاختبارات والتقييم</h1>
+                    <p class="text-xs text-slate-500">نظام القياس والتطوير المهني الداخلي</p>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-2 space-x-reverse">
+                <span class="inline-flex items-center text-xs font-semibold px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 ml-1.5 animate-pulse"></span>
+                    النظام نشط
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-4xl mx-auto px-4 py-8 flex-1 w-full">
+
+        <!-- 1. Screen: Employee Registration & Test Selection -->
+        <section id="loginScreen" class="block animate-fade-in">
+            <div class="bg-white border border-slate-200 rounded-3xl p-6 sm:p-10 shadow-xl shadow-slate-200/50 max-w-2xl mx-auto">
+                <div class="text-center mb-8">
+                    <div class="w-16 h-16 bg-brand-50 text-brand-600 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-brand-100">
+                        <i data-lucide="user-check" class="w-8 h-8"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-slate-900">تسجيل بيانات الموظف</h2>
+                    <p class="text-sm text-slate-500 mt-1">يرجى إدخال بياناتك الوظيفية واختيار الاختبار المطلوب بدقة</p>
+                </div>
+
+                <form id="startExamForm" class="space-y-5">
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1.5">اسم الموظف الكامل <span class="text-rose-500">*</span></label>
+                        <div class="relative">
+                            <input type="text" id="empName" required placeholder="مثال: أحمد محمد علي" class="w-full pl-4 pr-10 py-3 rounded-xl border border-slate-300 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition text-sm">
+                            <i data-lucide="user" class="w-5 h-5 absolute right-3 top-3.5 text-slate-400"></i>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-1.5">الرقم الوظيفي (ID) <span class="text-rose-500">*</span></label>
+                            <div class="relative">
+                                <input type="text" id="empCode" required placeholder="مثال: EMP-1042" class="w-full pl-4 pr-10 py-3 rounded-xl border border-slate-300 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition text-sm font-mono">
+                                <i data-lucide="badge" class="w-5 h-5 absolute right-3 top-3.5 text-slate-400"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-1.5">القسم / الإدارة</label>
+                            <div class="relative">
+                                <input type="text" id="empDept" placeholder="مثال: المبيعات / تقنية المعلومات" class="w-full pl-4 pr-10 py-3 rounded-xl border border-slate-300 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition text-sm">
+                                <i data-lucide="briefcase" class="w-5 h-5 absolute right-3 top-3.5 text-slate-400"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1.5">اختر الاختبار <span class="text-rose-500">*</span></label>
+                        <select id="testSelect" required class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition text-sm bg-white">
+                            <option value="">جاري تحميل الاختبارات المتاحة...</option>
+                        </select>
+                        <div id="testInfoBox" class="mt-2 hidden p-3 bg-brand-50/70 border border-brand-100 rounded-xl text-xs text-brand-800 flex items-center justify-between">
+                            <span id="testDurationBadge" class="flex items-center"><i data-lucide="clock" class="w-3.5 h-3.5 ml-1"></i> <span id="testDurationText">15 دقيقة</span></span>
+                            <span id="testQuestionsBadge" class="flex items-center"><i data-lucide="help-circle" class="w-3.5 h-3.5 ml-1"></i> <span id="testQuestionsText">5 أسئلة</span></span>
+                        </div>
+                    </div>
+
+                    <div class="p-3.5 bg-amber-50 border border-amber-200/80 rounded-xl text-amber-800 text-xs flex items-start space-x-2 space-x-reverse">
+                        <i data-lucide="alert-circle" class="w-4 h-4 mt-0.5 text-amber-600 shrink-0"></i>
+                        <span><strong>تنبيه:</strong> بمجرد بدء الاختبار، لن تظهر نتيجتك أو درجاتك فور الانتهاء؛ حيث يتم تسجيل الإجابات وتوجيهها مباشرة للتقييم الداخلي في لوحة تحكم الإدارة.</span>
+                    </div>
+
+                    <button type="submit" id="startBtn" class="w-full py-3.5 px-6 rounded-xl bg-brand-600 hover:bg-brand-700 active:bg-brand-800 text-white font-bold text-base shadow-lg shadow-brand-500/25 transition flex items-center justify-center space-x-2 space-x-reverse">
+                        <span>بدء الاختبار الآن</span>
+                        <i data-lucide="arrow-left" class="w-5 h-5"></i>
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- 2. Screen: Exam Taking Interface -->
+        <section id="examScreen" class="hidden">
+            <!-- Sticky Stats Bar -->
+            <div class="bg-white border border-slate-200 rounded-2xl p-4 mb-6 shadow-sm flex flex-wrap items-center justify-between gap-4 sticky top-16 z-20">
+                <div>
+                    <h2 id="activeTestTitle" class="text-base sm:text-lg font-bold text-slate-900">عنوان الاختبار</h2>
+                    <p id="activeEmployeeBadge" class="text-xs text-slate-500 flex items-center mt-0.5">
+                        <i data-lucide="user" class="w-3.5 h-3.5 ml-1 text-slate-400"></i>
+                        <span id="badgeName">الموظف</span> | <span id="badgeCode" class="font-mono">EMP-000</span>
+                    </p>
+                </div>
+
+                <div class="flex items-center space-x-3 space-x-reverse">
+                    <!-- Timer -->
+                    <div id="timerContainer" class="flex items-center bg-slate-100 text-slate-800 px-3 py-1.5 rounded-xl border border-slate-200 font-mono text-sm font-bold">
+                        <i data-lucide="clock" class="w-4 h-4 ml-1.5 text-brand-600"></i>
+                        <span id="timerDisplay">15:00</span>
+                    </div>
+
+                    <!-- Progress Badge -->
+                    <div class="text-xs font-semibold px-3 py-1.5 rounded-xl bg-brand-50 text-brand-700 border border-brand-100 flex items-center">
+                        <span id="progressText">0 / 0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden mb-6">
+                <div id="examProgressBar" class="bg-brand-600 h-full w-0 transition-all duration-300"></div>
+            </div>
+
+            <!-- Questions Container -->
+            <div id="questionsContainer" class="space-y-6">
+                <!-- Injected via JS -->
+            </div>
+
+            <!-- Bottom Action Bar -->
+            <div class="mt-8 pt-6 border-t border-slate-200 flex items-center justify-between">
+                <span class="text-xs text-slate-500">تأكد من إجابتك على جميع الأسئلة قبل التسليم النهائي</span>
+                <button type="button" onclick="confirmSubmitExam()" class="px-8 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold text-base shadow-lg shadow-emerald-600/25 transition flex items-center space-x-2 space-x-reverse">
+                    <i data-lucide="check-circle" class="w-5 h-5"></i>
+                    <span>إنهاء وتسليم الاختبار</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- 3. Screen: Success & Completion -->
+        <section id="successScreen" class="hidden animate-fade-in">
+            <div class="bg-white border border-slate-200 rounded-3xl p-8 sm:p-12 shadow-xl shadow-slate-200/50 max-w-xl mx-auto text-center">
+                <div class="w-20 h-20 bg-emerald-50 text-emerald-600 rounded-3xl flex items-center justify-center mx-auto mb-6 border border-emerald-100 shadow-lg shadow-emerald-500/10">
+                    <i data-lucide="check" class="w-10 h-10 stroke-[2.5]"></i>
+                </div>
+
+                <span class="inline-block px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold mb-3">
+                    تم التسليم بنجاح
+                </span>
+
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-3">شكراً لمشاركتك!</h2>
+
+                <p class="text-slate-600 text-sm sm:text-base leading-relaxed mb-6">
+                    تم تسجيل إجاباتك يا <strong id="successEmpName" class="text-slate-900 font-bold">الموظف</strong> بنجاح وحفظها في قاعدة بيانات النظام.
+                </p>
+
+                <div class="p-4 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-600 text-right space-y-2 mb-8">
+                    <div class="flex items-center text-slate-800 font-semibold mb-1">
+                        <i data-lucide="info" class="w-4 h-4 ml-1.5 text-brand-600"></i>
+                        <span>ملاحظة حول النتائج والتقييم:</span>
+                    </div>
+                    <p class="text-slate-500 leading-normal">
+                        نظام التقييم مصمم بحيث لا تظهر النتيجة أو الدرجات للموظف، وسيتم مراجعة وتحليل تقييم إجاباتك مباشرة من قِبل إدارة الموارد البشرية / الإدارة المعنية عبر لوحة تحكم الإدارة.
+                    </p>
+                </div>
+
+                <div class="flex justify-center">
+                    <button onclick="resetApp()" class="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm shadow-md shadow-brand-500/20 transition flex items-center justify-center space-x-2 space-x-reverse">
+                        <i data-lucide="check" class="w-4 h-4"></i>
+                        <span>إنهاء والعودة للرئيسية</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-5 text-center text-xs text-slate-500">
+        منصة تقييم الكفاءات الداخلية &bull; تم الإنشاء والتطوير بواسطة <strong class="font-bold text-slate-800 text-sm">البشمهندس يوسف محمود</strong>
+    </footer>
+
+    <!-- Confirm Submit Modal -->
+    <div id="confirmModal" class="fixed inset-0 bg-slate-950/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl border border-slate-200 text-center animate-scale-up">
+            <div class="w-14 h-14 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-amber-100">
+                <i data-lucide="help-circle" class="w-8 h-8"></i>
+            </div>
+            <h3 class="text-lg font-bold text-slate-900 mb-2">تأكيد تسليم الاختبار</h3>
+            <p id="confirmModalText" class="text-sm text-slate-600 mb-6">
+                هل أنت متأكد من رغبتك في إنهاء وتسليم إجاباتك؟ لن تتمكن من التعديل بعد التأكيد.
+            </p>
+            <div class="flex items-center space-x-3 space-x-reverse">
+                <button onclick="submitExamFinal()" class="flex-1 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm transition shadow-lg shadow-emerald-600/20">
+                    نعم، تسليم الاختبار
+                </button>
+                <button onclick="closeModal()" class="flex-1 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm transition">
+                    مراجعة الإجابات
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Script -->
+    <script>
+        // State
+        let availableTests = [];
+        let currentTest = null;
+        let employeeData = { name: '', code: '', dept: '' };
+        let userAnswers = {}; // { questionId: selectedOptionId }
+        let timerInterval = null;
+        let remainingSeconds = 0;
+
+        // Init
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            loadAvailableTests();
+
+            document.getElementById('testSelect').addEventListener('change', onTestSelectChange);
+            document.getElementById('startExamForm').addEventListener('submit', onStartExam);
+        });
+
+        // Load Tests from API
+        async function loadAvailableTests() {
+            try {
+                const res = await fetch('/api/tests');
+                if (!res.ok) throw new Error('فشل جلب الاختبارات');
+                availableTests = await res.json();
+
+                const select = document.getElementById('testSelect');
+                if (availableTests.length === 0) {
+                    select.innerHTML = '<option value="">لا توجد اختبارات متاحة حالياً</option>';
+                    return;
+                }
+
+                select.innerHTML = '<option value="">-- اختر الاختبار الذي ترغب بأدائه --</option>' +
+                    availableTests.map(t => `<option value="${t.id}">${t.title} (${t.totalQuestions} أسئلة - ${t.durationMinutes} دقيقة)</option>`).join('');
+
+                // Auto-select first test if available
+                if (availableTests.length > 0) {
+                    select.value = availableTests[0].id;
+                    onTestSelectChange();
+                }
+            } catch (err) {
+                console.error(err);
+                alert('تعذر الاتصال بالسيرفر لتحميل الاختبارات.');
+            }
+        }
+
+        function onTestSelectChange() {
+            const testId = document.getElementById('testSelect').value;
+            const infoBox = document.getElementById('testInfoBox');
+            if (!testId) {
+                infoBox.classList.add('hidden');
+                return;
+            }
+
+            const test = availableTests.find(t => t.id == testId);
+            if (test) {
+                document.getElementById('testDurationText').innerText = `${test.durationMinutes} دقيقة`;
+                document.getElementById('testQuestionsText').innerText = `${test.totalQuestions} سؤال`;
+                infoBox.classList.remove('hidden');
+            }
+            lucide.createIcons();
+        }
+
+        // Start Exam
+        async function onStartExam(e) {
+            e.preventDefault();
+            const name = document.getElementById('empName').value.trim();
+            const code = document.getElementById('empCode').value.trim();
+            const dept = document.getElementById('empDept').value.trim();
+            const testId = document.getElementById('testSelect').value;
+
+            if (!name || !code || !testId) {
+                alert('يرجى ملء جميع الحقول المطلوبة');
+                return;
+            }
+
+            employeeData = { name, code, dept };
+
+            // Fetch Full Exam Data (without correct answers!)
+            try {
+                const res = await fetch(`/api/tests/${testId}`);
+                if (!res.ok) throw new Error('فشل تحميل الاختبار');
+                currentTest = await res.json();
+
+                startExamInterface();
+            } catch (err) {
+                console.error(err);
+                alert('حدث خطأ أثناء تحميل أسئلة الاختبار.');
+            }
+        }
+
+        function startExamInterface() {
+            userAnswers = {};
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('examScreen').classList.remove('hidden');
+
+            document.getElementById('activeTestTitle').innerText = currentTest.title;
+            document.getElementById('badgeName').innerText = employeeData.name;
+            document.getElementById('badgeCode').innerText = employeeData.code;
+
+            renderQuestions();
+            updateProgress();
+
+            // Start Timer
+            if (currentTest.durationMinutes > 0) {
+                remainingSeconds = currentTest.durationMinutes * 60;
+                startTimer();
+            } else {
+                document.getElementById('timerContainer').classList.add('hidden');
+            }
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            lucide.createIcons();
+        }
+
+        function renderQuestions() {
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = '';
+
+            currentTest.questions.forEach((q, idx) => {
+                const card = document.createElement('div');
+                card.className = "bg-white border border-slate-200 rounded-2xl p-6 shadow-sm transition hover:border-slate-300";
+                card.id = `q-card-${q.id}`;
+
+                const typeBadge = q.type === 'true_false' 
+                    ? '<span class="px-2.5 py-1 rounded-lg bg-purple-50 text-purple-700 text-xs font-bold border border-purple-100">صح / خطأ</span>'
+                    : '<span class="px-2.5 py-1 rounded-lg bg-blue-50 text-blue-700 text-xs font-bold border border-blue-100">اختيار من متعدد</span>';
+
+                let optionsHtml = '';
+
+                if (q.type === 'true_false') {
+                    // True/False Visual Buttons
+                    optionsHtml = `
+                        <div class="grid grid-cols-2 gap-4 mt-4">
+                            ${q.options.map(opt => `
+                                <button type="button" 
+                                    onclick="selectOption(${q.id}, ${opt.id})"
+                                    id="opt-btn-${opt.id}"
+                                    class="option-btn p-4 rounded-xl border-2 border-slate-200 hover:border-brand-500 hover:bg-brand-50/50 flex items-center justify-center space-x-2 space-x-reverse font-bold text-slate-700 transition">
+                                    <span class="w-5 h-5 rounded-full border-2 border-slate-300 flex items-center justify-center radio-indicator ml-2"></span>
+                                    <span>${opt.text}</span>
+                                </button>
+                            `).join('')}
+                        </div>
+                    `;
+                } else {
+                    // MCQ List
+                    optionsHtml = `
+                        <div class="space-y-3 mt-4">
+                            ${q.options.map((opt, optIdx) => `
+                                <div onclick="selectOption(${q.id}, ${opt.id})"
+                                     id="opt-btn-${opt.id}"
+                                     class="option-btn p-4 rounded-xl border border-slate-200 hover:border-brand-400 hover:bg-brand-50/30 cursor-pointer flex items-center space-x-3 space-x-reverse transition">
+                                    <span class="w-5 h-5 rounded-full border-2 border-slate-300 flex items-center justify-center radio-indicator shrink-0"></span>
+                                    <span class="text-sm font-medium text-slate-700">${opt.text}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                }
+
+                card.innerHTML = `
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center space-x-2 space-x-reverse">
+                            <span class="w-7 h-7 rounded-lg bg-slate-100 text-slate-700 text-xs font-bold flex items-center justify-center">${idx + 1}</span>
+                            ${typeBadge}
+                        </div>
+                        <span class="text-xs font-semibold text-slate-400">${q.points} درجات</span>
+                    </div>
+                    <p class="text-base font-bold text-slate-900 leading-relaxed">${q.text}</p>
+                    ${optionsHtml}
+                `;
+
+                container.appendChild(card);
+            });
+        }
+
+        function selectOption(questionId, optionId) {
+            userAnswers[questionId] = optionId;
+
+            // Update UI for this question
+            const q = currentTest.questions.find(item => item.id === questionId);
+            if (!q) return;
+
+            q.options.forEach(opt => {
+                const btn = document.getElementById(`opt-btn-${opt.id}`);
+                const indicator = btn.querySelector('.radio-indicator');
+                if (opt.id === optionId) {
+                    btn.classList.add('border-brand-600', 'bg-brand-50/80', 'text-brand-900');
+                    btn.classList.remove('border-slate-200');
+                    indicator.innerHTML = '<span class="w-2.5 h-2.5 bg-brand-600 rounded-full"></span>';
+                    indicator.classList.add('border-brand-600');
+                } else {
+                    btn.classList.remove('border-brand-600', 'bg-brand-50/80', 'text-brand-900');
+                    btn.classList.add('border-slate-200');
+                    indicator.innerHTML = '';
+                    indicator.classList.remove('border-brand-600');
+                }
+            });
+
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const answeredCount = Object.keys(userAnswers).length;
+            const totalCount = currentTest.questions.length;
+            const percentage = Math.round((answeredCount / totalCount) * 100);
+
+            document.getElementById('progressText').innerText = `${answeredCount} من ${totalCount} مكتمل`;
+            document.getElementById('examProgressBar').style.width = `${percentage}%`;
+        }
+
+        // Timer Logic
+        function startTimer() {
+            updateTimerDisplay();
+            timerInterval = setInterval(() => {
+                remainingSeconds--;
+                updateTimerDisplay();
+
+                if (remainingSeconds <= 0) {
+                    clearInterval(timerInterval);
+                    alert('انتهى الوقت المحدد للاختبار! سيتم تسليم إجاباتك تلقائياً الآن.');
+                    submitExamFinal();
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(remainingSeconds / 60);
+            const seconds = remainingSeconds % 60;
+            const formatted = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            document.getElementById('timerDisplay').innerText = formatted;
+
+            if (remainingSeconds < 120) {
+                document.getElementById('timerContainer').classList.add('bg-rose-50', 'text-rose-700', 'border-rose-200');
+                document.getElementById('timerContainer').classList.remove('bg-slate-100', 'text-slate-800');
+            }
+        }
+
+        // Confirm Submit Modal
+        function confirmSubmitExam() {
+            const answeredCount = Object.keys(userAnswers).length;
+            const totalCount = currentTest.questions.length;
+            const missing = totalCount - answeredCount;
+
+            const modalText = document.getElementById('confirmModalText');
+            if (missing > 0) {
+                modalText.innerHTML = `لديك <strong class="text-rose-600">${missing} سؤال لم تتم الإجابة عليه</strong>.<br>هل ترغب بالتسليم على أي حال؟`;
+            } else {
+                modalText.innerText = 'لقد أجبت على جميع الأسئلة. هل أنت متأكد من تسليم الاختبار؟';
+            }
+
+            document.getElementById('confirmModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('confirmModal').classList.add('hidden');
+        }
+
+        // Final Submission to API
+        async function submitExamFinal() {
+            closeModal();
+            if (timerInterval) clearInterval(timerInterval);
+
+            const payload = {
+                employeeName: employeeData.name,
+                employeeCode: employeeData.code,
+                department: employeeData.dept,
+                answers: Object.entries(userAnswers).map(([qId, optId]) => ({
+                    questionId: parseInt(qId),
+                    selectedOptionId: optId
+                }))
+            };
+
+            try {
+                const res = await fetch(`/api/tests/${currentTest.id}/submit`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!res.ok) throw new Error('فشل إرسال الإجابات');
+                const result = await res.json();
+
+                // Show Success Screen (Result does NOT contain score)
+                document.getElementById('examScreen').classList.add('hidden');
+                document.getElementById('successScreen').classList.remove('hidden');
+                document.getElementById('successEmpName').innerText = employeeData.name;
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                lucide.createIcons();
+            } catch (err) {
+                console.error(err);
+                alert('حدث خطأ أثناء حفظ الإجابات. يرجى المحاولة مجدداً.');
+            }
+        }
+
+        function resetApp() {
+            document.getElementById('successScreen').classList.add('hidden');
+            document.getElementById('examScreen').classList.add('hidden');
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('startExamForm').reset();
+            currentTest = null;
+            userAnswers = {};
+            if (timerInterval) clearInterval(timerInterval);
+            loadAvailableTests();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>

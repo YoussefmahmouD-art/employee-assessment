@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة تحكم الإدارة | تقييمات الموظفين</title>
+    <!-- Google Fonts Cairo -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Cairo', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            800: '#1e40af',
+                            900: '#1e3a8a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Cairo', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col justify-between selection:bg-brand-500 selection:text-white">
+
+    <!-- Header Navigation -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center space-x-3 space-x-reverse">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-700 to-indigo-500 flex items-center justify-center text-white shadow-md shadow-indigo-500/20">
+                    <i data-lucide="shield-check" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold text-slate-900 leading-tight">لوحة تحكم الإدارة (Admin Dashboard)</h1>
+                    <p class="text-xs text-slate-500">متابعة تقييمات الموظفين وإدارة بنوك الأسئلة</p>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-3 space-x-reverse">
+                <a href="/index.html" target="_blank" class="inline-flex items-center text-xs font-bold px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition">
+                    <i data-lucide="external-link" class="w-4 h-4 ml-1.5 text-brand-600"></i>
+                    فتح بوابة اختبار الموظف ↗
+                </a>
+                <button id="refreshBtn" onclick="refreshData()" class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition hidden" title="تحديث البيانات">
+                    <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                </button>
+                <button id="logoutBtn" onclick="adminLogout()" class="px-3.5 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold text-xs transition flex items-center space-x-1.5 space-x-reverse hidden">
+                    <i data-lucide="log-out" class="w-4 h-4 ml-1"></i>
+                    <span>تسجيل خروج</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- 1. LOGIN GATE SCREEN (Shown if not logged in) -->
+    <div id="adminLoginSection" class="flex-1 flex items-center justify-center p-4">
+        <div class="bg-white border border-slate-200 rounded-3xl p-8 sm:p-10 shadow-2xl shadow-slate-200/50 max-w-md w-full text-center">
+            <div class="w-16 h-16 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-indigo-100">
+                <i data-lucide="lock" class="w-8 h-8"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-slate-900 mb-1">تسجيل دخول الإدارة</h2>
+            <p class="text-xs text-slate-500 mb-6">هذه اللوحة خاصة بالمسؤولين فقط لعرض تقييمات الموظفين</p>
+
+            <form id="loginForm" onsubmit="handleAdminLogin(event)" class="space-y-4">
+                <div>
+                    <label class="block text-right text-xs font-bold text-slate-700 mb-1.5">كلمة مرور الإدارة</label>
+                    <input type="password" id="adminPasswordInput" required placeholder="أدخل كلمة المرور..." class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none text-sm transition text-center font-mono tracking-widest">
+                </div>
+                <div id="loginErrorMsg" class="hidden p-3 bg-rose-50 border border-rose-200 text-rose-700 text-xs rounded-xl font-bold">
+                    كلمة المرور غير صحيحة، يرجى المحاولة مرة أخرى.
+                </div>
+                <button type="submit" class="w-full py-3.5 px-6 rounded-xl bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-bold text-sm shadow-lg shadow-indigo-600/25 transition flex items-center justify-center space-x-2 space-x-reverse">
+                    <span>دخول للوحة التحكم</span>
+                    <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 2. MAIN DASHBOARD CONTENT (Protected) -->
+    <main id="adminDashboardContent" class="max-w-7xl mx-auto px-4 py-8 flex-1 w-full space-y-8 hidden">
+
+        <!-- Top Stats Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            <!-- Card 1 -->
+            <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                <div class="flex items-center justify-between mb-3">
+                    <span class="text-xs font-bold text-slate-400">إجمالي الاختبارات</span>
+                    <div class="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                        <i data-lucide="file-text" class="w-5 h-5"></i>
+                    </div>
+                </div>
+                <div class="text-2xl font-black text-slate-900" id="statTotalTests">-</div>
+                <p class="text-xs text-slate-500 mt-1">اختبارات منشورة ونشطة</p>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                <div class="flex items-center justify-between mb-3">
+                    <span class="text-xs font-bold text-slate-400">مشاركات الموظفين</span>
+                    <div class="w-9 h-9 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
+                        <i data-lucide="users" class="w-5 h-5"></i>
+                    </div>
+                </div>
+                <div class="text-2xl font-black text-slate-900" id="statTotalSubmissions">-</div>
+                <p class="text-xs text-slate-500 mt-1">إجمالي التقييمات المسجلة</p>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                <div class="flex items-center justify-between mb-3">
+                    <span class="text-xs font-bold text-slate-400">نسبة الاجتياز العامة</span>
+                    <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                        <i data-lucide="trending-up" class="w-5 h-5"></i>
+                    </div>
+                </div>
+                <div class="text-2xl font-black text-emerald-600" id="statPassRate">-%</div>
+                <p class="text-xs text-slate-500 mt-1"><span id="statPassedCount">0</span> موظف حققوا درجة النجاح</p>
+            </div>
+
+            <!-- Card 4 -->
+            <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                <div class="flex items-center justify-between mb-3">
+                    <span class="text-xs font-bold text-slate-400">متوسط الدرجات</span>
+                    <div class="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+                        <i data-lucide="bar-chart-2" class="w-5 h-5"></i>
+                    </div>
+                </div>
+                <div class="text-2xl font-black text-slate-900" id="statAvgPercentage">-%</div>
+                <p class="text-xs text-slate-500 mt-1">المعدل التراكمي لجميع الموظفين</p>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="flex border-b border-slate-200 space-x-4 space-x-reverse">
+            <button onclick="switchTab('submissions')" id="tabBtnSubmissions" class="tab-btn px-6 py-3 font-bold text-sm border-b-2 border-brand-600 text-brand-600 transition flex items-center space-x-2 space-x-reverse">
+                <i data-lucide="clipboard-list" class="w-4 h-4"></i>
+                <span>تقييمات ونتائج الموظفين</span>
+            </button>
+            <button onclick="switchTab('tests')" id="tabBtnTests" class="tab-btn px-6 py-3 font-bold text-sm border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition flex items-center space-x-2 space-x-reverse">
+                <i data-lucide="file-plus-2" class="w-4 h-4"></i>
+                <span>إدارة وبناء الاختبارات</span>
+            </button>
+        </div>
+
+        <!-- ========================================================= -->
+        <!-- TAB 1: SUBMISSIONS & EVALUATIONS -->
+        <!-- ========================================================= -->
+        <section id="tabSubmissions" class="space-y-4">
+            <!-- Filter Bar -->
+            <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm flex flex-wrap items-center justify-between gap-4">
+                <div class="flex-1 min-w-[240px] relative">
+                    <input type="text" id="searchInput" oninput="filterSubmissions()" placeholder="ابحث باسم الموظف، الرقم الوظيفي، أو الاختبار..." class="w-full pl-4 pr-10 py-2.5 rounded-xl border border-slate-300 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none text-sm transition">
+                    <i data-lucide="search" class="w-4 h-4 absolute right-3.5 top-3.5 text-slate-400"></i>
+                </div>
+
+                <div class="flex items-center space-x-3 space-x-reverse">
+                    <select id="statusFilter" onchange="filterSubmissions()" class="px-4 py-2.5 rounded-xl border border-slate-300 text-sm bg-white outline-none focus:border-brand-500">
+                        <option value="all">جميع الحالات (الكل)</option>
+                        <option value="passed">اجتاز بنجاح</option>
+                        <option value="failed">لم يجتز</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Submissions Table -->
+            <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-right text-sm">
+                        <thead class="bg-slate-50 border-b border-slate-200 text-slate-500 text-xs font-bold">
+                            <tr>
+                                <th class="p-4">اسم الموظف</th>
+                                <th class="p-4">الرقم الوظيفي</th>
+                                <th class="p-4">القسم</th>
+                                <th class="p-4">اسم الاختبار</th>
+                                <th class="p-4">الدرجة</th>
+                                <th class="p-4">النسبة والتقييم</th>
+                                <th class="p-4">تاريخ التسليم</th>
+                                <th class="p-4 text-center">الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="submissionsTableBody" class="divide-y divide-slate-100">
+                            <tr>
+                                <td colspan="8" class="p-8 text-center text-slate-400">جاري تحميل النتائج...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================= -->
+        <!-- TAB 2: TEST BUILDER & MANAGEMENT -->
+        <!-- ========================================================= -->
+        <section id="tabTests" class="hidden space-y-8">
+
+            <!-- Create New Test Card -->
+            <div class="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm">
+                <div class="border-b border-slate-200 pb-5 mb-6 flex items-center justify-between">
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-900">إنشاء اختبار تقييم جديد</h2>
+                        <p class="text-xs text-slate-500 mt-1">أضف اختباراً جديداً مع تحديد نوع الأسئلة (اختيار من متعدد MCQ أو صح وخطأ) والإجابات الصحيحة</p>
+                    </div>
+                </div>
+
+                <form id="createTestForm" class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-semibold text-slate-700 mb-1">عنوان الاختبار <span class="text-rose-500">*</span></label>
+                            <input type="text" id="newTestTitle" required placeholder="مثال: اختبار الكفاءة في خدمة العملاء" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:border-brand-500 outline-none text-sm">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-semibold text-slate-700 mb-1">وصف الاختبار / تعليمات</label>
+                            <textarea id="newTestDesc" rows="2" placeholder="اكتب نبذة أو تعليمات إرشادية للموظف قبل بدء الاختبار..." class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:border-brand-500 outline-none text-sm"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-1">مدة الاختبار (بالدقائق)</label>
+                            <input type="number" id="newTestDuration" value="15" min="1" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:border-brand-500 outline-none text-sm font-mono">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-1">نسبة الاجتياز (%)</label>
+                            <input type="number" id="newTestPassing" value="60" min="1" max="100" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:border-brand-500 outline-none text-sm font-mono">
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Questions Builder -->
+                    <div class="pt-6 border-t border-slate-200">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-base font-bold text-slate-900 flex items-center">
+                                <i data-lucide="help-circle" class="w-4 h-4 ml-1.5 text-brand-600"></i>
+                                بنك الأسئلة (<span id="questionCountLabel">0</span>)
+                            </h3>
+                            <div class="flex space-x-2 space-x-reverse">
+                                <button type="button" onclick="addQuestion('mcq')" class="px-3.5 py-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold text-xs transition flex items-center space-x-1.5 space-x-reverse border border-blue-200">
+                                    <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                                    <span>إضافة سؤال اختيار من متعدد (MCQ)</span>
+                                </button>
+                                <button type="button" onclick="addQuestion('true_false')" class="px-3.5 py-2 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 font-bold text-xs transition flex items-center space-x-1.5 space-x-reverse border border-purple-200">
+                                    <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                                    <span>إضافة سؤال صح / خطأ</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="builderQuestionsList" class="space-y-4">
+                            <!-- Injected Questions -->
+                        </div>
+                    </div>
+
+                    <div class="pt-6 border-t border-slate-200 flex justify-end">
+                        <button type="submit" class="px-8 py-3 rounded-xl bg-brand-600 hover:bg-brand-700 active:bg-brand-800 text-white font-bold text-sm shadow-lg shadow-brand-500/20 transition flex items-center space-x-2 space-x-reverse">
+                            <i data-lucide="save" class="w-4 h-4"></i>
+                            <span>حفظ ونشر الاختبار الآن</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Existing Tests List -->
+            <div class="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm">
+                <h3 class="text-lg font-bold text-slate-900 mb-4">الاختبارات المتوفرة حالياً</h3>
+                <div id="existingTestsList" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Injected via JS -->
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500 mt-auto">
+        لوحة تحكم الإدارة &bull; تم الإنشاء والتطوير بواسطة <strong class="font-bold text-slate-800 text-sm">البشمهندس يوسف محمود</strong>
+    </footer>
+
+    <!-- Submission Details Modal (Admin View) -->
+    <div id="detailModal" class="fixed inset-0 bg-slate-950/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-3xl w-full max-h-[90vh] flex flex-col shadow-2xl border border-slate-200 animate-scale-up overflow-hidden">
+            <!-- Modal Header -->
+            <div class="p-6 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+                <div>
+                    <h3 class="text-lg font-bold text-slate-900 flex items-center">
+                        <i data-lucide="user-check" class="w-5 h-5 ml-2 text-brand-600"></i>
+                        تفاصيل تقييم إجابات: <span id="detailEmpName" class="mr-2 text-brand-700"></span>
+                    </h3>
+                    <p class="text-xs text-slate-500 mt-1" id="detailSubtitle">-</p>
+                </div>
+                <button onclick="closeDetailModal()" class="w-8 h-8 rounded-full bg-slate-200 hover:bg-slate-300 flex items-center justify-center text-slate-600 transition">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+
+            <!-- Modal Body (Scrollable) -->
+            <div class="p-6 overflow-y-auto space-y-6 flex-1">
+                <!-- Score Summary Banner -->
+                <div class="p-5 rounded-2xl border flex flex-wrap items-center justify-between gap-4" id="detailScoreBanner">
+                    <div>
+                        <span class="text-xs font-bold text-slate-500 block mb-1">النتيجة والتقييم النهائي</span>
+                        <div class="flex items-baseline space-x-2 space-x-reverse">
+                            <span class="text-3xl font-black text-slate-900" id="detailScoreText">0 / 0</span>
+                            <span class="text-xl font-bold text-slate-600" id="detailPercentageText">(0%)</span>
+                        </div>
+                    </div>
+                    <div>
+                        <span id="detailStatusBadge" class="px-4 py-1.5 rounded-full text-xs font-bold">-</span>
+                    </div>
+                </div>
+
+                <!-- Questions and Answers Breakdown -->
+                <div>
+                    <h4 class="text-sm font-bold text-slate-900 mb-3">تفصيل الإجابات للسؤال:</h4>
+                    <div id="detailAnswersList" class="space-y-4">
+                        <!-- Injected via JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="p-4 border-t border-slate-200 bg-slate-50 flex justify-end">
+                <button onclick="closeDetailModal()" class="px-6 py-2.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-sm transition">
+                    إغلاق
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Script -->
+    <script>
+        let allSubmissions = [];
+        let allTests = [];
+        let builderQuestions = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+
+            const savedToken = sessionStorage.getItem('adminToken');
+            if (savedToken) {
+                showDashboard();
+            } else {
+                showLogin();
+            }
+
+            // Form Submit for Creating Test
+            document.getElementById('createTestForm').addEventListener('submit', handleCreateTest);
+        });
+
+        function showLogin() {
+            document.getElementById('adminLoginSection').classList.remove('hidden');
+            document.getElementById('adminDashboardContent').classList.add('hidden');
+            document.getElementById('refreshBtn').classList.add('hidden');
+            document.getElementById('logoutBtn').classList.add('hidden');
+            lucide.createIcons();
+        }
+
+        function showDashboard() {
+            document.getElementById('adminLoginSection').classList.add('hidden');
+            document.getElementById('adminDashboardContent').classList.remove('hidden');
+            document.getElementById('refreshBtn').classList.remove('hidden');
+            document.getElementById('logoutBtn').classList.remove('hidden');
+            refreshData();
+            lucide.createIcons();
+        }
+
+        async function handleAdminLogin(e) {
+            e.preventDefault();
+            const password = document.getElementById('adminPasswordInput').value;
+            const errorMsg = document.getElementById('loginErrorMsg');
+            errorMsg.classList.add('hidden');
+
+            try {
+                const res = await fetch('/api/admin/verify-login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password })
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    sessionStorage.setItem('adminToken', data.token);
+                    document.getElementById('adminPasswordInput').value = '';
+                    showDashboard();
+                } else {
+                    errorMsg.classList.remove('hidden');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('فشل الاتصال بالسيرفر للتحقق من كلمة المرور');
+            }
+        }
+
+        function adminLogout() {
+            sessionStorage.removeItem('adminToken');
+            showLogin();
+        }
+
+        // Helper fetch with Admin Key
+        async function adminFetch(url, options = {}) {
+            const token = sessionStorage.getItem('adminToken');
+            options.headers = {
+                ...options.headers,
+                'X-Admin-Key': token
+            };
+
+            const res = await fetch(url, options);
+            if (res.status === 401) {
+                adminLogout();
+                throw new Error('جلسة الدخول منتهية أو غير مصرح بها');
+            }
+            return res;
+        }
+
+        async function refreshData() {
+            await Promise.all([
+                loadStats(),
+                loadSubmissions(),
+                loadTests()
+            ]);
+            lucide.createIcons();
+        }
+
+        // 1. Stats
+        async function loadStats() {
+            try {
+                const res = await adminFetch('/api/admin/stats');
+                if (!res.ok) throw new Error('فشل جلب الإحصائيات');
+                const data = await res.json();
+
+                document.getElementById('statTotalTests').innerText = data.totalTests;
+                document.getElementById('statTotalSubmissions').innerText = data.totalSubmissions;
+                document.getElementById('statPassRate').innerText = `${data.passRate}%`;
+                document.getElementById('statPassedCount').innerText = data.passedCount;
+                document.getElementById('statAvgPercentage').innerText = `${data.averagePercentage}%`;
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        // 2. Submissions
+        async function loadSubmissions() {
+            try {
+                const res = await adminFetch('/api/admin/submissions');
+                if (!res.ok) throw new Error('فشل جلب المشاركات');
+                allSubmissions = await res.json();
+                renderSubmissionsTable(allSubmissions);
+            } catch (err) {
+                console.error(err);
+                document.getElementById('submissionsTableBody').innerHTML = `
+                    <tr><td colspan="8" class="p-8 text-center text-rose-500 font-bold">فشل الاتصال بجلب النتائج</td></tr>
+                `;
+            }
+        }
+
+        function renderSubmissionsTable(submissions) {
+            const tbody = document.getElementById('submissionsTableBody');
+            if (submissions.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="p-12 text-center text-slate-400">
+                            <i data-lucide="inbox" class="w-10 h-10 mx-auto mb-2 text-slate-300 stroke-1"></i>
+                            لم يقم أي موظف بإجراء أي اختبار حتى الآن.
+                        </td>
+                    </tr>
+                `;
+                lucide.createIcons();
+                return;
+            }
+
+            tbody.innerHTML = submissions.map(s => {
+                const isPassed = s.isPassed;
+                const statusBadge = isPassed
+                    ? `<span class="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold inline-flex items-center"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500 ml-1.5"></span>اجتاز (${s.percentage}%)</span>`
+                    : `<span class="px-2.5 py-1 rounded-full bg-rose-50 text-rose-700 border border-rose-200 text-xs font-bold inline-flex items-center"><span class="w-1.5 h-1.5 rounded-full bg-rose-500 ml-1.5"></span>لم يجتز (${s.percentage}%)</span>`;
+
+                const date = new Date(s.submittedAt).toLocaleString('ar-EG', {
+                    dateStyle: 'short',
+                    timeStyle: 'short'
+                });
+
+                return `
+                    <tr class="hover:bg-slate-50/80 transition">
+                        <td class="p-4 font-bold text-slate-900">${s.employeeName}</td>
+                        <td class="p-4 font-mono text-xs text-slate-600 font-semibold">${s.employeeCode}</td>
+                        <td class="p-4 text-xs text-slate-500">${s.department || 'عام'}</td>
+                        <td class="p-4 font-semibold text-slate-800">${s.testTitle}</td>
+                        <td class="p-4 font-bold text-slate-900 font-mono">${s.totalScore} / ${s.maxScore}</td>
+                        <td class="p-4">${statusBadge}</td>
+                        <td class="p-4 text-xs text-slate-400 font-mono">${date}</td>
+                        <td class="p-4 text-center">
+                            <div class="flex items-center justify-center space-x-2 space-x-reverse">
+                                <button onclick="viewSubmissionDetails(${s.id})" class="px-3 py-1.5 rounded-lg bg-brand-50 hover:bg-brand-100 text-brand-700 font-bold text-xs transition flex items-center space-x-1 space-x-reverse">
+                                    <i data-lucide="eye" class="w-3.5 h-3.5"></i>
+                                    <span>عرض الإجابات</span>
+                                </button>
+                                <button onclick="deleteSubmission(${s.id})" class="p-1.5 rounded-lg hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition" title="حذف">
+                                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            lucide.createIcons();
+        }
+
+        function filterSubmissions() {
+            const query = document.getElementById('searchInput').value.trim().toLowerCase();
+            const status = document.getElementById('statusFilter').value;
+
+            const filtered = allSubmissions.filter(s => {
+                const matchQuery = s.employeeName.toLowerCase().includes(query) ||
+                    s.employeeCode.toLowerCase().includes(query) ||
+                    s.testTitle.toLowerCase().includes(query);
+
+                let matchStatus = true;
+                if (status === 'passed') matchStatus = s.isPassed === true;
+                if (status === 'failed') matchStatus = s.isPassed === false;
+
+                return matchQuery && matchStatus;
+            });
+
+            renderSubmissionsTable(filtered);
+        }
+
+        // View Submission Detail Modal
+        async function viewSubmissionDetails(id) {
+            try {
+                const res = await adminFetch(`/api/admin/submissions/${id}`);
+                if (!res.ok) throw new Error('فشل تحميل تفاصيل التقييم');
+                const sub = await res.json();
+
+                document.getElementById('detailEmpName').innerText = sub.employeeName;
+                document.getElementById('detailSubtitle').innerText = `الرقم الوظيفي: ${sub.employeeCode} | القسم: ${sub.department || 'عام'} | الاختبار: ${sub.testTitle}`;
+                document.getElementById('detailScoreText').innerText = `${sub.totalScore} / ${sub.maxScore}`;
+                document.getElementById('detailPercentageText').innerText = `(${sub.percentage}%)`;
+
+                const banner = document.getElementById('detailScoreBanner');
+                const badge = document.getElementById('detailStatusBadge');
+
+                if (sub.isPassed) {
+                    banner.className = "p-5 rounded-2xl border border-emerald-200 bg-emerald-50/70 flex flex-wrap items-center justify-between gap-4";
+                    badge.className = "px-4 py-1.5 rounded-full text-xs font-bold bg-emerald-600 text-white";
+                    badge.innerText = "اجتاز الاختبار بنجاح";
+                } else {
+                    banner.className = "p-5 rounded-2xl border border-rose-200 bg-rose-50/70 flex flex-wrap items-center justify-between gap-4";
+                    badge.className = "px-4 py-1.5 rounded-full text-xs font-bold bg-rose-600 text-white";
+                    badge.innerText = "لم يحقق درجة الاجتياز";
+                }
+
+                // Render Answers Breakdown
+                const list = document.getElementById('detailAnswersList');
+                list.innerHTML = sub.answers.map((ans, idx) => {
+                    const isRight = ans.isCorrect;
+                    const cardBorder = isRight ? "border-emerald-200 bg-emerald-50/20" : "border-rose-200 bg-rose-50/20";
+                    const statusTag = isRight 
+                        ? `<span class="px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 text-xs font-bold flex items-center"><i data-lucide="check" class="w-3.5 h-3.5 ml-1"></i> إجابة صحيحة (+${ans.pointsEarned})</span>`
+                        : `<span class="px-2 py-0.5 rounded-md bg-rose-100 text-rose-800 text-xs font-bold flex items-center"><i data-lucide="x" class="w-3.5 h-3.5 ml-1"></i> إجابة خاطئة (0)</span>`;
+
+                    return `
+                        <div class="p-4 rounded-xl border ${cardBorder} space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-slate-500">سؤال ${idx + 1}</span>
+                                ${statusTag}
+                            </div>
+                            <p class="font-bold text-slate-900 text-sm">${ans.questionText}</p>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs pt-1">
+                                <div class="p-2.5 rounded-lg ${isRight ? 'bg-emerald-100/70 text-emerald-950 font-semibold' : 'bg-rose-100/70 text-rose-950 font-semibold'}">
+                                    <span class="block text-[11px] text-slate-500 mb-0.5">إجابة الموظف:</span>
+                                    <span>${ans.selectedOptionText}</span>
+                                </div>
+                                ${!isRight ? `
+                                    <div class="p-2.5 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-900 font-semibold">
+                                        <span class="block text-[11px] text-emerald-700 mb-0.5">الإجابة النموذجية الصحيحة:</span>
+                                        <span>${ans.correctOptionText}</span>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                document.getElementById('detailModal').classList.remove('hidden');
+                lucide.createIcons();
+            } catch (err) {
+                console.error(err);
+                alert('تعذر جلب تفاصيل إجابات الموظف');
+            }
+        }
+
+        function closeDetailModal() {
+            document.getElementById('detailModal').classList.add('hidden');
+        }
+
+        async function deleteSubmission(id) {
+            if (!confirm('هل أنت متأكد من حذف هذا السجل نهائياً؟')) return;
+            try {
+                const res = await adminFetch(`/api/admin/submissions/${id}`, { method: 'DELETE' });
+                if (res.ok) {
+                    refreshData();
+                } else {
+                    alert('فشل حذف السجل');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('حدث خطأ');
+            }
+        }
+
+        // 3. Tests Management
+        async function loadTests() {
+            try {
+                const res = await fetch('/api/tests');
+                if (!res.ok) throw new Error('فشل جلب الاختبارات');
+                allTests = await res.json();
+                renderExistingTests();
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        function renderExistingTests() {
+            const container = document.getElementById('existingTestsList');
+            if (allTests.length === 0) {
+                container.innerHTML = '<p class="text-sm text-slate-400">لا توجد اختبارات.</p>';
+                return;
+            }
+
+            container.innerHTML = allTests.map(t => `
+                <div class="p-5 rounded-2xl border border-slate-200 bg-slate-50/50 hover:bg-slate-50 transition flex flex-col justify-between space-y-4">
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="px-2 py-0.5 rounded-md bg-blue-100 text-blue-800 text-xs font-bold font-mono">ID: ${t.id}</span>
+                            <span class="text-xs text-slate-500 font-semibold">${t.totalQuestions} أسئلة</span>
+                        </div>
+                        <h4 class="font-bold text-slate-900 text-base mb-1">${t.title}</h4>
+                        <p class="text-xs text-slate-500 line-clamp-2">${t.description || 'بدون وصف'}</p>
+                    </div>
+
+                    <div class="pt-3 border-t border-slate-200/60 flex items-center justify-between text-xs text-slate-600">
+                        <span>المدة: <strong>${t.durationMinutes} دقيقة</strong></span>
+                        <span>الاجتياز: <strong>${t.passingScorePercentage}%</strong></span>
+                        <button onclick="deleteTest(${t.id})" class="text-rose-600 hover:text-rose-800 font-bold transition flex items-center">
+                            <i data-lucide="trash" class="w-3.5 h-3.5 ml-1"></i> حذف
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+
+            lucide.createIcons();
+        }
+
+        async function deleteTest(id) {
+            if (!confirm('حذف الاختبار سيؤدي أيضاً إلى حذف جميع إجابات وتقييمات الموظفين المرتبطة به. هل تريد المتابعة؟')) return;
+            try {
+                const res = await adminFetch(`/api/admin/tests/${id}`, { method: 'DELETE' });
+                if (res.ok) {
+                    refreshData();
+                } else {
+                    alert('فشل حذف الاختبار');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('حدث خطأ');
+            }
+        }
+
+        // Question Builder Logic
+        function addQuestion(type = 'mcq') {
+            const newQ = {
+                id: Date.now(),
+                type: type,
+                text: '',
+                points: 10,
+                options: type === 'true_false' 
+                    ? [
+                        { text: 'صح', isCorrect: true },
+                        { text: 'خطأ', isCorrect: false }
+                      ]
+                    : [
+                        { text: 'الخيار الأول', isCorrect: true },
+                        { text: 'الخيار الثاني', isCorrect: false },
+                        { text: 'الخيار الثالث', isCorrect: false }
+                      ]
+            };
+
+            builderQuestions.push(newQ);
+            renderBuilderQuestions();
+        }
+
+        function removeQuestion(index) {
+            builderQuestions.splice(index, 1);
+            renderBuilderQuestions();
+        }
+
+        function addOptionToQuestion(qIndex) {
+            builderQuestions[qIndex].options.push({
+                text: `خيار جديد`,
+                isCorrect: false
+            });
+            renderBuilderQuestions();
+        }
+
+        function removeOption(qIndex, optIndex) {
+            if (builderQuestions[qIndex].options.length <= 2) {
+                alert('يجب أن يحتوي السؤال على خيارين على الأقل');
+                return;
+            }
+            builderQuestions[qIndex].options.splice(optIndex, 1);
+            renderBuilderQuestions();
+        }
+
+        function setCorrectOption(qIndex, optIndex) {
+            builderQuestions[qIndex].options.forEach((opt, idx) => {
+                opt.isCorrect = (idx === optIndex);
+            });
+            renderBuilderQuestions();
+        }
+
+        function renderBuilderQuestions() {
+            document.getElementById('questionCountLabel').innerText = builderQuestions.length;
+            const container = document.getElementById('builderQuestionsList');
+
+            if (builderQuestions.length === 0) {
+                container.innerHTML = `
+                    <div class="p-8 text-center border-2 border-dashed border-slate-200 rounded-2xl text-slate-400 text-sm">
+                        لم تقم بإضافة أي سؤال بعد. اضغط على أزرار الإضافة أعلاه لإضافة أسئلة MCQ أو صح وخطأ.
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = builderQuestions.map((q, qIdx) => {
+                const typeLabel = q.type === 'true_false' 
+                    ? '<span class="px-2 py-0.5 rounded bg-purple-100 text-purple-800 text-xs font-bold">صح أو خطأ</span>'
+                    : '<span class="px-2 py-0.5 rounded bg-blue-100 text-blue-800 text-xs font-bold">اختيار من متعدد (MCQ)</span>';
+
+                let optionsHtml = '';
+
+                if (q.type === 'true_false') {
+                    optionsHtml = `
+                        <div class="mt-3 p-3 bg-slate-50 rounded-xl">
+                            <span class="block text-xs font-bold text-slate-600 mb-2">اختر الإجابة الصحيحة المعتمدة لهذا السؤال:</span>
+                            <div class="flex space-x-4 space-x-reverse">
+                                ${q.options.map((opt, optIdx) => `
+                                    <label class="flex items-center space-x-2 space-x-reverse cursor-pointer px-4 py-2 rounded-lg border ${opt.isCorrect ? 'border-emerald-500 bg-emerald-50 font-bold text-emerald-800' : 'border-slate-200 bg-white text-slate-700'}">
+                                        <input type="radio" name="tf_correct_${q.id}" ${opt.isCorrect ? 'checked' : ''} onchange="setCorrectOption(${qIdx}, ${optIdx})" class="text-brand-600 ml-2">
+                                        <span>${opt.text}</span>
+                                    </label>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    optionsHtml = `
+                        <div class="mt-3 space-y-2">
+                            <span class="block text-xs font-bold text-slate-600">الخيارات المتاحة (ضع علامة على الدائرة لتحديد الإجابة الصحيحة):</span>
+                            ${q.options.map((opt, optIdx) => `
+                                <div class="flex items-center space-x-2 space-x-reverse">
+                                    <input type="radio" name="mcq_correct_${q.id}" ${opt.isCorrect ? 'checked' : ''} onchange="setCorrectOption(${qIdx}, ${optIdx})" title="حدد كإجابة صحيحة" class="w-4 h-4 text-emerald-600 cursor-pointer">
+                                    <input type="text" value="${opt.text}" oninput="builderQuestions[${qIdx}].options[${optIdx}].text = this.value" placeholder="نص الخيار..." class="flex-1 px-3 py-1.5 rounded-lg border border-slate-300 text-xs focus:border-brand-500 outline-none">
+                                    <button type="button" onclick="removeOption(${qIdx}, ${optIdx})" class="p-1.5 text-slate-400 hover:text-rose-600 rounded" title="حذف الخيار">
+                                        <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                                    </button>
+                                </div>
+                            `).join('')}
+                            <button type="button" onclick="addOptionToQuestion(${qIdx})" class="text-xs text-brand-600 hover:text-brand-800 font-bold flex items-center mt-2">
+                                <i data-lucide="plus" class="w-3.5 h-3.5 ml-1"></i> إضافة خيار إضافي
+                            </button>
+                        </div>
+                    `;
+                }
+
+                return `
+                    <div class="p-5 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-3">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-2 space-x-reverse">
+                                <span class="w-6 h-6 rounded-md bg-slate-100 text-slate-800 text-xs font-bold flex items-center justify-center font-mono">${qIdx + 1}</span>
+                                ${typeLabel}
+                            </div>
+                            <div class="flex items-center space-x-3 space-x-reverse">
+                                <div class="flex items-center text-xs">
+                                    <span class="text-slate-500 ml-1.5">الدرجة:</span>
+                                    <input type="number" value="${q.points}" oninput="builderQuestions[${qIdx}].points = parseInt(this.value) || 1" min="1" class="w-14 px-2 py-1 border rounded text-center font-mono">
+                                </div>
+                                <button type="button" onclick="removeQuestion(${qIdx})" class="text-slate-400 hover:text-rose-600 p-1" title="حذف السؤال">
+                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div>
+                            <input type="text" value="${q.text}" oninput="builderQuestions[${qIdx}].text = this.value" placeholder="اكتب نص السؤال هنا..." class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm font-semibold focus:border-brand-500 outline-none">
+                        </div>
+
+                        ${optionsHtml}
+                    </div>
+                `;
+            }).join('');
+
+            lucide.createIcons();
+        }
+
+        async function handleCreateTest(e) {
+            e.preventDefault();
+
+            const title = document.getElementById('newTestTitle').value.trim();
+            const description = document.getElementById('newTestDesc').value.trim();
+            const duration = parseInt(document.getElementById('newTestDuration').value) || 15;
+            const passing = parseInt(document.getElementById('newTestPassing').value) || 60;
+
+            if (builderQuestions.length === 0) {
+                alert('يجب إضافة سؤال واحد على الأقل للاختبار');
+                return;
+            }
+
+            for (let i = 0; i < builderQuestions.length; i++) {
+                const q = builderQuestions[i];
+                if (!q.text.trim()) {
+                    alert(`يرجى كتابة نص السؤال رقم ${i + 1}`);
+                    return;
+                }
+                const hasCorrect = q.options.some(o => o.isCorrect);
+                if (!hasCorrect) {
+                    alert(`يرجى تحديد الإجابة الصحيحة للسؤال رقم ${i + 1}`);
+                    return;
+                }
+            }
+
+            const payload = {
+                title,
+                description,
+                durationMinutes: duration,
+                passingScorePercentage: passing,
+                questions: builderQuestions.map(q => ({
+                    text: q.text.trim(),
+                    type: q.type,
+                    points: q.points,
+                    options: q.options.map(o => ({
+                        text: o.text.trim(),
+                        isCorrect: o.isCorrect
+                    }))
+                }))
+            };
+
+            try {
+                const res = await adminFetch('/api/admin/tests', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!res.ok) throw new Error('فشل إنشاء الاختبار');
+                alert('تم إنشاء ونشر الاختبار بنجاح!');
+
+                document.getElementById('createTestForm').reset();
+                builderQuestions = [];
+                renderBuilderQuestions();
+                refreshData();
+                switchTab('submissions');
+            } catch (err) {
+                console.error(err);
+                alert('حدث خطأ أثناء حفظ الاختبار');
+            }
+        }
+
+        // Tabs Switching
+        function switchTab(tab) {
+            const btnSubmissions = document.getElementById('tabBtnSubmissions');
+            const btnTests = document.getElementById('tabBtnTests');
+            const viewSubmissions = document.getElementById('tabSubmissions');
+            const viewTests = document.getElementById('tabTests');
+
+            if (tab === 'submissions') {
+                btnSubmissions.className = "tab-btn px-6 py-3 font-bold text-sm border-b-2 border-brand-600 text-brand-600 transition flex items-center space-x-2 space-x-reverse";
+                btnTests.className = "tab-btn px-6 py-3 font-bold text-sm border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition flex items-center space-x-2 space-x-reverse";
+                viewSubmissions.classList.remove('hidden');
+                viewTests.classList.add('hidden');
+            } else {
+                btnTests.className = "tab-btn px-6 py-3 font-bold text-sm border-b-2 border-brand-600 text-brand-600 transition flex items-center space-x-2 space-x-reverse";
+                btnSubmissions.className = "tab-btn px-6 py-3 font-bold text-sm border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition flex items-center space-x-2 space-x-reverse";
+                viewTests.classList.remove('hidden');
+                viewSubmissions.classList.add('hidden');
+            }
+            lucide.createIcons();
+        }
+    </script>
+</body>
+</html>

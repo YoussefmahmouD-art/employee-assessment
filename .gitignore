@@ -1,0 +1,25 @@
+# Build and publish directories
+bin/
+obj/
+publish/
+publish.zip
+
+# SQLite Database and logs
+*.db
+*.db-shm
+*.db-wal
+logs/
+*.log
+
+# Visual Studio / Rider / VSCode caches
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# OS files
+.DS_Store
+Thumbs.db
