@@ -16,6 +16,7 @@ public class AppDbContext : DbContext
     public DbSet<SubmissionAnswer> SubmissionAnswers => Set<SubmissionAnswer>();
     public DbSet<TaxOffice> TaxOffices => Set<TaxOffice>();
     public DbSet<TaxOfficeSubmission> TaxOfficeSubmissions => Set<TaxOfficeSubmission>();
+    public DbSet<Employee> Employees => Set<Employee>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -45,6 +46,40 @@ public class AppDbContext : DbContext
 
     public static void SeedSampleData(AppDbContext context)
     {
+        // Ensure new tables are created even if database already existed before schema updates
+        context.Database.ExecuteSqlRaw(@"
+            CREATE TABLE IF NOT EXISTS TaxOffices (
+                Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                Name TEXT NOT NULL,
+                Code TEXT NULL,
+                Governorate TEXT NULL,
+                IsActive INTEGER NOT NULL DEFAULT 1,
+                CreatedAt TEXT NOT NULL
+            );
+            CREATE TABLE IF NOT EXISTS TaxOfficeSubmissions (
+                Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                TaxOfficeId INTEGER NOT NULL,
+                TaxOfficeName TEXT NOT NULL,
+                EmployeeName TEXT NOT NULL,
+                EmployeeCode TEXT NULL,
+                HasTaxpayerSheet INTEGER NOT NULL,
+                VisitFormPhotoPath TEXT NOT NULL,
+                TaxpayerSheetPath TEXT NULL,
+                SubmittedAt TEXT NOT NULL,
+                Notes TEXT NULL,
+                ExtractedTaxpayersCount INTEGER NOT NULL DEFAULT 0
+            );
+            CREATE TABLE IF NOT EXISTS Employees (
+                Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                Code TEXT NOT NULL,
+                Name TEXT NOT NULL,
+                Password TEXT NOT NULL,
+                Department TEXT NULL,
+                IsActive INTEGER NOT NULL DEFAULT 1,
+                CreatedAt TEXT NOT NULL
+            );
+        ");
+
         if (!context.TaxOffices.Any())
         {
             var defaultOffices = new List<TaxOffice>
@@ -61,6 +96,19 @@ public class AppDbContext : DbContext
                 new TaxOffice { Name = "مأمورية ضرائب طنطا ثان", Code = "TAX-TTA2", Governorate = "الغربية" }
             };
             context.TaxOffices.AddRange(defaultOffices);
+            context.SaveChanges();
+        }
+
+        if (!context.Employees.Any())
+        {
+            var defaultEmployees = new List<Employee>
+            {
+                new Employee { Code = "EMP-101", Name = "أحمد محمد علي", Password = "123", Department = "المبيعات" },
+                new Employee { Code = "EMP-102", Name = "محمود حسن إبراهيم", Password = "123", Department = "المتابعة الميدانية" },
+                new Employee { Code = "EMP-103", Name = "سارة إبراهيم الشناوي", Password = "123", Department = "الموارد البشرية" },
+                new Employee { Code = "EMP-104", Name = "محمد طارق عبد الرحمن", Password = "123", Department = "الضرائب والتحصيل" }
+            };
+            context.Employees.AddRange(defaultEmployees);
             context.SaveChanges();
         }
 

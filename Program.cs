@@ -70,8 +70,45 @@ app.UseDefaultFiles();
 app.UseStaticFiles();
 
 // ==========================================
-// 1. Employee Endpoints
+// 1. Employee Endpoints & Authentication
 // ==========================================
+
+// Employee Login
+app.MapPost("/api/auth/employee-login", async (EmployeeLoginRequest req, AppDbContext db) =>
+{
+    if (string.IsNullOrWhiteSpace(req.Code) || string.IsNullOrWhiteSpace(req.Password))
+    {
+        return Results.BadRequest(new { message = "الرقم الوظيفي وكلمة المرور مطلوبان" });
+    }
+
+    var cleanCode = req.Code.Trim();
+    var cleanPass = req.Password.Trim();
+
+    var employee = await db.Employees
+        .FirstOrDefaultAsync(e => e.Code.ToLower() == cleanCode.ToLower() && e.Password == cleanPass);
+
+    if (employee == null)
+    {
+        return Results.BadRequest(new { message = "الرقم الوظيفي أو كلمة المرور غير صحيحة" });
+    }
+
+    if (!employee.IsActive)
+    {
+        return Results.BadRequest(new { message = "هذا الحساب معطل حالياً، يرجى مراجعة الإدارة" });
+    }
+
+    return Results.Ok(new
+    {
+        success = true,
+        employee = new
+        {
+            employee.Id,
+            employee.Code,
+            employee.Name,
+            employee.Department
+        }
+    });
+});
 
 // Get list of available tests for employees
 app.MapGet("/api/tests", async (AppDbContext db) =>
@@ -219,6 +256,78 @@ app.MapPost("/api/admin/verify-login", (AdminLoginRequest req) =>
         return Results.Ok(new { success = true, token = ADMIN_PASSWORD });
     }
     return Results.Unauthorized();
+});
+
+// Admin: Get all employees
+app.MapGet("/api/admin/employees", async (AppDbContext db) =>
+{
+    var employees = await db.Employees
+        .OrderBy(e => e.Code)
+        .ToListAsync();
+
+    return Results.Ok(employees);
+});
+
+// Admin: Add new employee
+app.MapPost("/api/admin/employees", async (CreateEmployeeDto dto, AppDbContext db) =>
+{
+    if (string.IsNullOrWhiteSpace(dto.Name) || string.IsNullOrWhiteSpace(dto.Code))
+    {
+        return Results.BadRequest(new { message = "اسم الموظف ورقمه الوظيفي مطلوبان" });
+    }
+
+    var cleanCode = dto.Code.Trim();
+    if (await db.Employees.AnyAsync(e => e.Code.ToLower() == cleanCode.ToLower()))
+    {
+        return Results.BadRequest(new { message = "الرقم الوظيفي مسجل مسبقاً لموظف آخر" });
+    }
+
+    var newEmp = new Employee
+    {
+        Code = cleanCode,
+        Name = dto.Name.Trim(),
+        Password = string.IsNullOrWhiteSpace(dto.Password) ? "123" : dto.Password.Trim(),
+        Department = string.IsNullOrWhiteSpace(dto.Department) ? "عام" : dto.Department.Trim(),
+        IsActive = true,
+        CreatedAt = DateTime.UtcNow
+    };
+
+    db.Employees.Add(newEmp);
+    await db.SaveChangesAsync();
+
+    return Results.Created($"/api/admin/employees/{newEmp.Id}", newEmp);
+});
+
+// Admin: Update employee info or password
+app.MapPut("/api/admin/employees/{id:int}", async (int id, UpdateEmployeeDto dto, AppDbContext db) =>
+{
+    var emp = await db.Employees.FindAsync(id);
+    if (emp == null)
+    {
+        return Results.NotFound(new { message = "الموظف غير موجود" });
+    }
+
+    if (!string.IsNullOrWhiteSpace(dto.Name)) emp.Name = dto.Name.Trim();
+    if (!string.IsNullOrWhiteSpace(dto.Password)) emp.Password = dto.Password.Trim();
+    if (!string.IsNullOrWhiteSpace(dto.Department)) emp.Department = dto.Department.Trim();
+    emp.IsActive = dto.IsActive;
+
+    await db.SaveChangesAsync();
+    return Results.Ok(emp);
+});
+
+// Admin: Delete employee
+app.MapDelete("/api/admin/employees/{id:int}", async (int id, AppDbContext db) =>
+{
+    var emp = await db.Employees.FindAsync(id);
+    if (emp == null)
+    {
+        return Results.NotFound(new { message = "الموظف غير موجود" });
+    }
+
+    db.Employees.Remove(emp);
+    await db.SaveChangesAsync();
+    return Results.Ok(new { success = true });
 });
 
 // Create new test with questions & options

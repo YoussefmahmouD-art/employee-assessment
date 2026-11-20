@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تسجيل دخول الموظف | المنصة الداخلية</title>
+    <!-- Google Fonts Cairo -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Cairo', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            800: '#1e40af',
+                            900: '#1e3a8a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Cairo', sans-serif; }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-100 via-slate-50 to-blue-50 text-slate-800 min-h-screen flex flex-col justify-between selection:bg-brand-500 selection:text-white">
+
+    <!-- Header Navigation -->
+    <header class="py-4 px-6 flex items-center justify-between">
+        <div class="flex items-center space-x-3 space-x-reverse">
+            <div class="w-10 h-10 rounded-2xl bg-brand-600 flex items-center justify-center text-white shadow-md shadow-brand-500/20">
+                <i data-lucide="shield-check" class="w-6 h-6"></i>
+            </div>
+            <div>
+                <span class="text-base font-bold text-slate-900 block leading-tight">المنصة الداخلية الموحدة</span>
+                <span class="text-xs text-slate-400">نظام الاختبارات والمأموريات الميدانية</span>
+            </div>
+        </div>
+
+        <div>
+            <a href="/admin.html" class="inline-flex items-center text-xs font-semibold px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 transition shadow-sm">
+                <i data-lucide="lock" class="w-3.5 h-3.5 ml-1.5 text-brand-600"></i>
+                بوابة الإدارة
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-1 flex items-center justify-center p-4">
+        <div class="bg-white border border-slate-200 rounded-3xl p-8 sm:p-10 shadow-2xl shadow-slate-200/60 max-w-md w-full">
+            
+            <div class="text-center mb-8">
+                <div class="w-16 h-16 bg-brand-50 text-brand-600 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-brand-100 shadow-inner">
+                    <i data-lucide="user-check" class="w-8 h-8"></i>
+                </div>
+                <h2 class="text-2xl font-black text-slate-900">تسجيل دخول الموظف</h2>
+                <p class="text-xs text-slate-500 mt-1">أدخل الرقم الوظيفي وكلمة المرور للوصول لكافة الخدمات</p>
+            </div>
+
+            <!-- Login Form -->
+            <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
+                
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1.5">الرقم الوظيفي / كود الموظف (ID)</label>
+                    <div class="relative">
+                        <input type="text" id="employeeCode" required placeholder="مثال: EMP-101" class="w-full pl-4 pr-10 py-3 rounded-xl border border-slate-300 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none text-sm transition font-mono font-bold">
+                        <i data-lucide="badge" class="w-5 h-5 absolute right-3 top-3.5 text-slate-400"></i>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1.5">كلمة المرور</label>
+                    <div class="relative">
+                        <input type="password" id="employeePassword" required placeholder="••••••" class="w-full pl-10 pr-10 py-3 rounded-xl border border-slate-300 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none text-sm transition font-mono tracking-wider">
+                        <i data-lucide="key" class="w-5 h-5 absolute right-3 top-3.5 text-slate-400"></i>
+                        <button type="button" onclick="togglePasswordVisibility()" class="absolute left-3 top-3 text-slate-400 hover:text-slate-600">
+                            <i data-lucide="eye" id="eyeIcon" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="errorBox" class="hidden p-3 bg-rose-50 border border-rose-200 text-rose-700 text-xs rounded-xl font-bold flex items-center space-x-2 space-x-reverse">
+                    <i data-lucide="alert-circle" class="w-4 h-4 shrink-0 text-rose-600"></i>
+                    <span id="errorMessage">الرقم الوظيفي أو كلمة المرور غير صحيحة</span>
+                </div>
+
+                <button type="submit" id="submitBtn" class="w-full py-3.5 px-6 rounded-xl bg-brand-600 hover:bg-brand-700 active:bg-brand-800 text-white font-bold text-sm shadow-lg shadow-brand-500/25 transition flex items-center justify-center space-x-2 space-x-reverse mt-2">
+                    <span>دخول المنصة</span>
+                    <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                </button>
+
+            </form>
+
+            <!-- Quick Demo Accounts (For easy testing) -->
+            <div class="mt-8 pt-5 border-t border-slate-100">
+                <span class="block text-[11px] font-bold text-slate-400 mb-2 text-center">حسابات تجريبية سريعة (اضغط للتعبئة):</span>
+                <div class="grid grid-cols-2 gap-2 text-xs">
+                    <button type="button" onclick="fillDemo('EMP-101', '123')" class="p-2 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 font-semibold text-right transition">
+                        <span class="block font-bold">أحمد علي</span>
+                        <span class="font-mono text-[11px] text-slate-400">EMP-101 (123)</span>
+                    </button>
+                    <button type="button" onclick="fillDemo('EMP-102', '123')" class="p-2 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 font-semibold text-right transition">
+                        <span class="block font-bold">محمود حسن</span>
+                        <span class="font-mono text-[11px] text-slate-400">EMP-102 (123)</span>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="py-4 text-center text-xs text-slate-400">
+        المنصة الداخلية للموظفين &bull; تم الإنشاء والتطوير بواسطة <strong class="font-bold text-slate-700">البشمهندس يوسف محمود</strong>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            // If already logged in, redirect
+            const existing = localStorage.getItem('employeeUser');
+            if (existing) {
+                const params = new URLSearchParams(window.location.search);
+                const returnUrl = params.get('returnUrl') || '/index.html';
+                window.location.href = returnUrl;
+            }
+        });
+
+        function fillDemo(code, pass) {
+            document.getElementById('employeeCode').value = code;
+            document.getElementById('employeePassword').value = pass;
+        }
+
+        function togglePasswordVisibility() {
+            const input = document.getElementById('employeePassword');
+            const icon = document.getElementById('eyeIcon');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.setAttribute('data-lucide', 'eye-off');
+            } else {
+                input.type = 'password';
+                icon.setAttribute('data-lucide', 'eye');
+            }
+            lucide.createIcons();
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            const code = document.getElementById('employeeCode').value.trim();
+            const password = document.getElementById('employeePassword').value.trim();
+            const errorBox = document.getElementById('errorBox');
+            const errorMsg = document.getElementById('errorMessage');
+            errorBox.classList.add('hidden');
+
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `
+                <i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i>
+                <span>جاري تسجيل الدخول...</span>
+            `;
+            lucide.createIcons();
+
+            try {
+                const res = await fetch('/api/auth/employee-login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ code, password })
+                });
+
+                if (!res.ok) {
+                    const err = await res.json();
+                    throw new Error(err.message || 'بيانات الدخول غير صحيحة');
+                }
+
+                const data = await res.json();
+                localStorage.setItem('employeeUser', JSON.stringify(data.employee));
+
+                // Redirect to returnUrl or index
+                const params = new URLSearchParams(window.location.search);
+                const returnUrl = params.get('returnUrl') || '/index.html';
+                window.location.href = returnUrl;
+            } catch (err) {
+                console.error(err);
+                errorMsg.innerText = err.message;
+                errorBox.classList.remove('hidden');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = `
+                    <span>دخول المنصة</span>
+                    <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                `;
+                lucide.createIcons();
+            }
+        }
+    </script>
+</body>
+</html>

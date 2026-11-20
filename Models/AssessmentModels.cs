@@ -132,6 +132,43 @@ public class AdminLoginRequest
 }
 
 // ==========================================
+// Employee Authentication & User Accounts
+// ==========================================
+
+public class Employee
+{
+    public int Id { get; set; }
+    public string Code { get; set; } = string.Empty; // Login ID (e.g. EMP-101)
+    public string Name { get; set; } = string.Empty;
+    public string Password { get; set; } = "123";
+    public string? Department { get; set; }
+    public bool IsActive { get; set; } = true;
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+}
+
+public class EmployeeLoginRequest
+{
+    public string Code { get; set; } = string.Empty;
+    public string Password { get; set; } = string.Empty;
+}
+
+public class CreateEmployeeDto
+{
+    public string Code { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
+    public string Password { get; set; } = "123";
+    public string? Department { get; set; }
+}
+
+public class UpdateEmployeeDto
+{
+    public string Name { get; set; } = string.Empty;
+    public string? Password { get; set; }
+    public string? Department { get; set; }
+    public bool IsActive { get; set; } = true;
+}
+
+// ==========================================
 // Tax Office & Field Visit Models
 // ==========================================
 

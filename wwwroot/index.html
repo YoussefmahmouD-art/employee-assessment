@@ -58,10 +58,13 @@
                     <i data-lucide="building-2" class="w-3.5 h-3.5 ml-1.5"></i>
                     تسليم مأمورية ضرائب
                 </a>
-                <span class="inline-flex items-center text-xs font-semibold px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
-                    <span class="w-2 h-2 rounded-full bg-emerald-500 ml-1.5 animate-pulse"></span>
-                    النظام نشط
-                </span>
+                <div class="hidden sm:flex items-center space-x-2 space-x-reverse px-3 py-1.5 rounded-xl bg-slate-100 text-slate-700 text-xs font-bold border border-slate-200">
+                    <i data-lucide="user" class="w-3.5 h-3.5 text-brand-600"></i>
+                    <span id="headerEmpName">الموظف</span>
+                </div>
+                <button onclick="logoutEmployee()" class="p-1.5 rounded-xl hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition" title="تسجيل خروج">
+                    <i data-lucide="log-out" class="w-4 h-4"></i>
+                </button>
             </div>
         </div>
     </header>
@@ -93,33 +96,26 @@
                     <div class="w-16 h-16 bg-brand-50 text-brand-600 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-brand-100">
                         <i data-lucide="user-check" class="w-8 h-8"></i>
                     </div>
-                    <h2 class="text-2xl font-bold text-slate-900">تسجيل بيانات الموظف</h2>
-                    <p class="text-sm text-slate-500 mt-1">يرجى إدخال بياناتك الوظيفية واختيار الاختبار المطلوب بدقة</p>
+                    <h2 class="text-2xl font-bold text-slate-900">بدء اختبار التقييم المهني</h2>
+                    <p class="text-sm text-slate-500 mt-1">يرجى مراجعة بياناتك واختيار الاختبار المطلوب للبدء مباشرة</p>
                 </div>
 
                 <form id="startExamForm" class="space-y-5">
-                    <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-1.5">اسم الموظف الكامل <span class="text-rose-500">*</span></label>
-                        <div class="relative">
-                            <input type="text" id="empName" required placeholder="مثال: أحمد محمد علي" class="w-full pl-4 pr-10 py-3 rounded-xl border border-slate-300 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition text-sm">
-                            <i data-lucide="user" class="w-5 h-5 absolute right-3 top-3.5 text-slate-400"></i>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-semibold text-slate-700 mb-1.5">الرقم الوظيفي (ID) <span class="text-rose-500">*</span></label>
-                            <div class="relative">
-                                <input type="text" id="empCode" required placeholder="مثال: EMP-1042" class="w-full pl-4 pr-10 py-3 rounded-xl border border-slate-300 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition text-sm font-mono">
-                                <i data-lucide="badge" class="w-5 h-5 absolute right-3 top-3.5 text-slate-400"></i>
+                    
+                    <!-- Logged-in Employee Info Card (Auto-filled) -->
+                    <div class="p-4 bg-slate-50 border border-slate-200 rounded-2xl flex items-center justify-between">
+                        <div class="flex items-center space-x-3 space-x-reverse">
+                            <div class="w-11 h-11 rounded-xl bg-brand-100 text-brand-700 flex items-center justify-center font-bold">
+                                <i data-lucide="user-check" class="w-6 h-6"></i>
+                            </div>
+                            <div>
+                                <span class="text-[11px] text-slate-400 font-bold block">الموظف المسجل:</span>
+                                <span id="displayEmpName" class="font-bold text-slate-900 text-sm">--</span>
                             </div>
                         </div>
-                        <div>
-                            <label class="block text-sm font-semibold text-slate-700 mb-1.5">القسم / الإدارة</label>
-                            <div class="relative">
-                                <input type="text" id="empDept" placeholder="مثال: المبيعات / تقنية المعلومات" class="w-full pl-4 pr-10 py-3 rounded-xl border border-slate-300 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition text-sm">
-                                <i data-lucide="briefcase" class="w-5 h-5 absolute right-3 top-3.5 text-slate-400"></i>
-                            </div>
+                        <div class="text-left">
+                            <span id="displayEmpCode" class="px-2.5 py-1 rounded-lg bg-white border border-slate-200 text-slate-700 font-mono text-xs font-bold block mb-0.5">--</span>
+                            <span id="displayEmpDept" class="text-[11px] text-slate-500 block">--</span>
                         </div>
                     </div>
 
@@ -262,6 +258,7 @@
         // State
         let availableTests = [];
         let currentTest = null;
+        let currentUser = null;
         let employeeData = { name: '', code: '', dept: '' };
         let userAnswers = {}; // { questionId: selectedOptionId }
         let timerInterval = null;
@@ -269,12 +266,32 @@
 
         // Init
         document.addEventListener('DOMContentLoaded', () => {
+            if (!checkAuth()) return;
             lucide.createIcons();
             loadAvailableTests();
 
             document.getElementById('testSelect').addEventListener('change', onTestSelectChange);
             document.getElementById('startExamForm').addEventListener('submit', onStartExam);
         });
+
+        function checkAuth() {
+            const raw = localStorage.getItem('employeeUser');
+            if (!raw) {
+                window.location.href = '/login.html?returnUrl=' + encodeURIComponent(window.location.pathname);
+                return false;
+            }
+            currentUser = JSON.parse(raw);
+            document.getElementById('headerEmpName').innerText = currentUser.name;
+            document.getElementById('displayEmpName').innerText = currentUser.name;
+            document.getElementById('displayEmpCode').innerText = currentUser.code;
+            document.getElementById('displayEmpDept').innerText = currentUser.department || 'عام';
+            return true;
+        }
+
+        function logoutEmployee() {
+            localStorage.removeItem('employeeUser');
+            window.location.href = '/login.html';
+        }
 
         // Load Tests from API
         async function loadAvailableTests() {
@@ -323,17 +340,18 @@
         // Start Exam
         async function onStartExam(e) {
             e.preventDefault();
-            const name = document.getElementById('empName').value.trim();
-            const code = document.getElementById('empCode').value.trim();
-            const dept = document.getElementById('empDept').value.trim();
             const testId = document.getElementById('testSelect').value;
 
-            if (!name || !code || !testId) {
-                alert('يرجى ملء جميع الحقول المطلوبة');
+            if (!testId) {
+                alert('يرجى اختيار الاختبار المطلوب');
                 return;
             }
 
-            employeeData = { name, code, dept };
+            employeeData = {
+                name: currentUser.name,
+                code: currentUser.code,
+                dept: currentUser.department || 'عام'
+            };
 
             // Fetch Full Exam Data (without correct answers!)
             try {
@@ -561,6 +579,7 @@
             currentTest = null;
             userAnswers = {};
             if (timerInterval) clearInterval(timerInterval);
+            checkAuth();
             loadAvailableTests();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
