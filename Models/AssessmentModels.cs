@@ -130,3 +130,49 @@ public class AdminLoginRequest
 {
     public string Password { get; set; } = string.Empty;
 }
+
+// ==========================================
+// Tax Office & Field Visit Models
+// ==========================================
+
+public class TaxOffice
+{
+    public int Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string? Code { get; set; }
+    public string? Governorate { get; set; }
+    public bool IsActive { get; set; } = true;
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+}
+
+public class TaxOfficeSubmission
+{
+    public int Id { get; set; }
+    public int TaxOfficeId { get; set; }
+    public string TaxOfficeName { get; set; } = string.Empty;
+    public string EmployeeName { get; set; } = string.Empty;
+    public string EmployeeCode { get; set; } = string.Empty;
+    public string SubmittedDate { get; set; } = string.Empty; // "yyyy-MM-dd"
+    public DateTime SubmittedAt { get; set; } = DateTime.UtcNow;
+    public string VisitPhotoUrl { get; set; } = string.Empty;
+    public bool HasExcelSheet { get; set; } = false;
+    public string? ExcelSheetUrl { get; set; }
+    public string? OriginalExcelFileName { get; set; }
+    public int RowCount { get; set; } = 0;
+    public string? Notes { get; set; }
+}
+
+public class CreateTaxOfficeDto
+{
+    public string Name { get; set; } = string.Empty;
+    public string? Code { get; set; }
+    public string? Governorate { get; set; }
+}
+
+public class UpdateTaxOfficeDto
+{
+    public string Name { get; set; } = string.Empty;
+    public string? Code { get; set; }
+    public string? Governorate { get; set; }
+    public bool IsActive { get; set; } = true;
+}

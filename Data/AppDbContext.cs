@@ -14,6 +14,8 @@ public class AppDbContext : DbContext
     public DbSet<Option> Options => Set<Option>();
     public DbSet<Submission> Submissions => Set<Submission>();
     public DbSet<SubmissionAnswer> SubmissionAnswers => Set<SubmissionAnswer>();
+    public DbSet<TaxOffice> TaxOffices => Set<TaxOffice>();
+    public DbSet<TaxOfficeSubmission> TaxOfficeSubmissions => Set<TaxOfficeSubmission>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -43,9 +45,28 @@ public class AppDbContext : DbContext
 
     public static void SeedSampleData(AppDbContext context)
     {
+        if (!context.TaxOffices.Any())
+        {
+            var defaultOffices = new List<TaxOffice>
+            {
+                new TaxOffice { Name = "مأمورية ضرائب قصر النيل", Code = "TAX-QN", Governorate = "القاهرة" },
+                new TaxOffice { Name = "مأمورية ضرائب الدقي", Code = "TAX-DQ", Governorate = "الجيزة" },
+                new TaxOffice { Name = "مأمورية ضرائب المعادي", Code = "TAX-MD", Governorate = "القاهرة" },
+                new TaxOffice { Name = "مأمورية ضرائب العجوزة", Code = "TAX-AG", Governorate = "الجيزة" },
+                new TaxOffice { Name = "مأمورية ضرائب مدينة نصر ثان", Code = "TAX-MN2", Governorate = "القاهرة" },
+                new TaxOffice { Name = "مأمورية ضرائب 6 أكتوبر", Code = "TAX-6OCT", Governorate = "الجيزة" },
+                new TaxOffice { Name = "مأمورية ضرائب مصر الجديدة", Code = "TAX-HJ", Governorate = "القاهرة" },
+                new TaxOffice { Name = "مأمورية ضرائب الإسكندرية أول", Code = "TAX-ALX1", Governorate = "الإسكندرية" },
+                new TaxOffice { Name = "مأمورية ضرائب المنصورة أول", Code = "TAX-MAN1", Governorate = "الدقهلية" },
+                new TaxOffice { Name = "مأمورية ضرائب طنطا ثان", Code = "TAX-TTA2", Governorate = "الغربية" }
+            };
+            context.TaxOffices.AddRange(defaultOffices);
+            context.SaveChanges();
+        }
+
         if (context.Tests.Any())
         {
-            return; // Already seeded
+            return; // Tests already seeded
         }
 
         var sampleTest = new Test

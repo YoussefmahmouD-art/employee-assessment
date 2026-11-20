@@ -158,6 +158,10 @@
                 <i data-lucide="file-plus-2" class="w-4 h-4"></i>
                 <span>إدارة وبناء الاختبارات</span>
             </button>
+            <button onclick="switchTab('tax')" id="tabBtnTax" class="tab-btn px-6 py-3 font-bold text-sm border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition flex items-center space-x-2 space-x-reverse">
+                <i data-lucide="building-2" class="w-4 h-4 text-emerald-600"></i>
+                <span>متابعة مأموريات الضرائب</span>
+            </button>
         </div>
 
         <!-- ========================================================= -->
@@ -283,6 +287,137 @@
 
         </section>
 
+        <!-- ========================================================= -->
+        <!-- TAB 3: TAX OFFICES & FIELD VISITS (متابعة مأموريات الضرائب) -->
+        <!-- ========================================================= -->
+        <section id="tabTax" class="hidden space-y-6">
+
+            <!-- Tax Stats Summary -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-bold text-slate-400">إجمالي المأموريات النشطة</span>
+                        <div class="w-8 h-8 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center">
+                            <i data-lucide="building-2" class="w-4 h-4"></i>
+                        </div>
+                    </div>
+                    <div class="text-2xl font-black text-slate-900" id="statTaxTotalOffices">-</div>
+                    <p class="text-xs text-slate-500 mt-0.5">مأموريات مسجلة بالنظام</p>
+                </div>
+
+                <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-bold text-slate-400">مأموريات تم تسليمها</span>
+                        <div class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                            <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+                        </div>
+                    </div>
+                    <div class="text-2xl font-black text-emerald-600" id="statTaxSubmittedCount">-</div>
+                    <p class="text-xs text-slate-500 mt-0.5">مأمورية سُلّمت لهذا اليوم</p>
+                </div>
+
+                <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-bold text-slate-400">مأموريات متبقية لم تسلم</span>
+                        <div class="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+                            <i data-lucide="clock" class="w-4 h-4"></i>
+                        </div>
+                    </div>
+                    <div class="text-2xl font-black text-amber-600" id="statTaxMissingCount">-</div>
+                    <p class="text-xs text-slate-500 mt-0.5">بانتظار التسليم اليوم</p>
+                </div>
+
+                <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-bold text-slate-400">شيتات إكسيل مجمعة</span>
+                        <div class="w-8 h-8 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center">
+                            <i data-lucide="file-spreadsheet" class="w-4 h-4"></i>
+                        </div>
+                    </div>
+                    <div class="text-2xl font-black text-teal-700" id="statTaxSheetsCount">-</div>
+                    <p class="text-xs text-slate-500 mt-0.5"><span id="statTaxRowsCount">0</span> ممول مسجل بالشيتات</p>
+                </div>
+            </div>
+
+            <!-- Date Selector & Export Actions Toolbar -->
+            <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm flex flex-wrap items-center justify-between gap-4">
+                <div class="flex items-center space-x-3 space-x-reverse">
+                    <span class="text-xs font-bold text-slate-700">تاريخ التقرير:</span>
+                    <input type="date" id="taxFilterDate" onchange="loadTaxSubmissions()" class="px-3.5 py-2 rounded-xl border border-slate-300 text-xs font-mono font-bold focus:border-emerald-500 outline-none">
+                    <button onclick="setTaxDateToday()" class="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition">
+                        اليوم
+                    </button>
+                    <button onclick="loadTaxSubmissions()" class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition" title="تحديث">
+                        <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                    </button>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-2">
+                    <!-- Export Master Excel -->
+                    <button onclick="downloadMasterExcel()" class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-md shadow-emerald-600/20 transition flex items-center space-x-1.5 space-x-reverse">
+                        <i data-lucide="download" class="w-4 h-4"></i>
+                        <span>تحميل تجميعة شيتات الممولين (Master Excel)</span>
+                    </button>
+
+                    <!-- Export Photos ZIP -->
+                    <button onclick="downloadVisitPhotosZip()" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold shadow-md transition flex items-center space-x-1.5 space-x-reverse">
+                        <i data-lucide="folder-archive" class="w-4 h-4"></i>
+                        <span>تحميل أرشيف نماذج الزيارات (ZIP)</span>
+                    </button>
+
+                    <!-- Manage Offices -->
+                    <button onclick="openTaxOfficesModal()" class="px-4 py-2.5 rounded-xl bg-teal-50 hover:bg-teal-100 text-teal-800 border border-teal-200 text-xs font-bold transition flex items-center space-x-1.5 space-x-reverse">
+                        <i data-lucide="plus" class="w-4 h-4"></i>
+                        <span>إدارة قائمة المأموريات</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Submissions Table -->
+            <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+                <div class="p-4 border-b border-slate-100 flex items-center justify-between">
+                    <h3 class="text-sm font-bold text-slate-900 flex items-center">
+                        <i data-lucide="list-checks" class="w-4 h-4 ml-1.5 text-emerald-600"></i>
+                        قائمة المأموريات المسلمة لهذا التاريخ
+                    </h3>
+                    <span id="taxTableBadge" class="text-xs font-bold px-2.5 py-1 rounded-full bg-slate-100 text-slate-600">0 تسليم</span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-right text-sm">
+                        <thead class="bg-slate-50 border-b border-slate-200 text-slate-500 text-xs font-bold">
+                            <tr>
+                                <th class="p-4">اسم المأمورية</th>
+                                <th class="p-4">الموظف / المندوب</th>
+                                <th class="p-4">الرقم الوظيفي</th>
+                                <th class="p-4">وقت التسليم</th>
+                                <th class="p-4">نموذج الزيارة</th>
+                                <th class="p-4">شيت بيانات الممولين</th>
+                                <th class="p-4 text-center">الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="taxSubmissionsTableBody" class="divide-y divide-slate-100">
+                            <tr>
+                                <td colspan="7" class="p-8 text-center text-slate-400">جاري تحميل بيانات المأموريات...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Missing Offices Follow-up Box -->
+            <div id="missingOfficesBox" class="bg-amber-50/70 border border-amber-200 rounded-2xl p-5 hidden">
+                <div class="flex items-center space-x-2 space-x-reverse text-amber-900 font-bold text-sm mb-2">
+                    <i data-lucide="alert-triangle" class="w-4 h-4 text-amber-600"></i>
+                    <span>مأموريات لم تقم بالتسليم لهذا اليوم (<span id="missingOfficesCountBadge">0</span>):</span>
+                </div>
+                <p class="text-xs text-amber-800 mb-3">القائمة التالية لم تسجل أي تسليم لتاريخ اليوم، يمكنك استخدامها لمتابعة المندوبين:</p>
+                <div id="missingOfficesPills" class="flex flex-wrap gap-2">
+                    <!-- Injected via JS -->
+                </div>
+            </div>
+
+        </section>
+
     </main>
 
     <!-- Footer -->
@@ -335,6 +470,105 @@
             <!-- Modal Footer -->
             <div class="p-4 border-t border-slate-200 bg-slate-50 flex justify-end">
                 <button onclick="closeDetailModal()" class="px-6 py-2.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-sm transition">
+                    إغلاق
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Photo Preview Modal (Lightbox) -->
+    <div id="photoPreviewModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl border border-slate-200 overflow-hidden animate-scale-up">
+            <div class="p-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+                <div>
+                    <h4 class="text-sm font-bold text-slate-900" id="lightboxTitle">نموذج زيارة المأمورية</h4>
+                    <p class="text-xs text-slate-500" id="lightboxSubtitle">-</p>
+                </div>
+                <div class="flex items-center space-x-2 space-x-reverse">
+                    <a id="lightboxOpenLink" href="#" target="_blank" class="px-3 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-bold transition flex items-center">
+                        <i data-lucide="external-link" class="w-3.5 h-3.5 ml-1"></i> فتح بالحجم الكامل
+                    </a>
+                    <button onclick="closePhotoPreview()" class="w-8 h-8 rounded-full bg-slate-200 hover:bg-slate-300 flex items-center justify-center text-slate-600 transition">
+                        <i data-lucide="x" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="p-4 overflow-auto flex-1 flex items-center justify-center bg-slate-900/5">
+                <img id="lightboxImg" src="" alt="نموذج الزيارة" class="max-h-[70vh] object-contain rounded-xl shadow border border-slate-200">
+            </div>
+        </div>
+    </div>
+
+    <!-- Tax Offices Management Modal -->
+    <div id="taxOfficesModal" class="fixed inset-0 bg-slate-950/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl border border-slate-200 overflow-hidden animate-scale-up">
+            <div class="p-5 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+                <div class="flex items-center space-x-2 space-x-reverse">
+                    <div class="w-9 h-9 rounded-xl bg-teal-100 text-teal-800 flex items-center justify-center">
+                        <i data-lucide="building-2" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-bold text-slate-900">إدارة قائمة مأموريات الضرائب</h3>
+                        <p class="text-xs text-slate-500">إضافة مأموريات جديدة وتفعيل/تعطيل المأموريات الحالية</p>
+                    </div>
+                </div>
+                <button onclick="closeTaxOfficesModal()" class="w-8 h-8 rounded-full bg-slate-200 hover:bg-slate-300 flex items-center justify-center text-slate-600 transition">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+
+            <div class="p-6 overflow-y-auto space-y-6 flex-1">
+                <!-- Add Office Form -->
+                <form id="addOfficeForm" onsubmit="handleAddTaxOffice(event)" class="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">
+                    <h4 class="text-xs font-bold text-slate-700 flex items-center">
+                        <i data-lucide="plus-circle" class="w-3.5 h-3.5 ml-1 text-emerald-600"></i>
+                        إضافة مأمورية جديدة:
+                    </h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div class="sm:col-span-1">
+                            <input type="text" id="newOfficeName" required placeholder="اسم المأمورية..." class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs focus:border-emerald-500 outline-none">
+                        </div>
+                        <div>
+                            <input type="text" id="newOfficeCode" placeholder="كود (مثال: TAX-01)..." class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs focus:border-emerald-500 outline-none font-mono">
+                        </div>
+                        <div>
+                            <input type="text" id="newOfficeGov" placeholder="المحافظة (مثال: القاهرة)..." class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs focus:border-emerald-500 outline-none">
+                        </div>
+                    </div>
+                    <div class="flex justify-end">
+                        <button type="submit" class="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow transition flex items-center space-x-1 space-x-reverse">
+                            <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                            <span>حفظ وإضافة للقائمة</span>
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Offices List Table -->
+                <div>
+                    <h4 class="text-xs font-bold text-slate-700 mb-2">المأموريات المسجلة حالياً:</h4>
+                    <div class="border border-slate-200 rounded-xl overflow-hidden">
+                        <table class="w-full text-right text-xs">
+                            <thead class="bg-slate-100 text-slate-600 font-bold">
+                                <tr>
+                                    <th class="p-3">اسم المأمورية</th>
+                                    <th class="p-3">الكود</th>
+                                    <th class="p-3">المحافظة</th>
+                                    <th class="p-3">الحالة</th>
+                                    <th class="p-3 text-center">الإجراء</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminTaxOfficesTableBody" class="divide-y divide-slate-100">
+                                <tr>
+                                    <td colspan="5" class="p-4 text-center text-slate-400">جاري التحميل...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-4 border-t border-slate-200 bg-slate-50 flex justify-end">
+                <button onclick="closeTaxOfficesModal()" class="px-6 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-xs transition">
                     إغلاق
                 </button>
             </div>
@@ -884,21 +1118,332 @@
         function switchTab(tab) {
             const btnSubmissions = document.getElementById('tabBtnSubmissions');
             const btnTests = document.getElementById('tabBtnTests');
+            const btnTax = document.getElementById('tabBtnTax');
             const viewSubmissions = document.getElementById('tabSubmissions');
             const viewTests = document.getElementById('tabTests');
+            const viewTax = document.getElementById('tabTax');
+
+            // Reset all tabs
+            [btnSubmissions, btnTests, btnTax].forEach(btn => {
+                btn.className = "tab-btn px-6 py-3 font-bold text-sm border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition flex items-center space-x-2 space-x-reverse";
+            });
+            viewSubmissions.classList.add('hidden');
+            viewTests.classList.add('hidden');
+            viewTax.classList.add('hidden');
 
             if (tab === 'submissions') {
                 btnSubmissions.className = "tab-btn px-6 py-3 font-bold text-sm border-b-2 border-brand-600 text-brand-600 transition flex items-center space-x-2 space-x-reverse";
-                btnTests.className = "tab-btn px-6 py-3 font-bold text-sm border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition flex items-center space-x-2 space-x-reverse";
                 viewSubmissions.classList.remove('hidden');
-                viewTests.classList.add('hidden');
-            } else {
+            } else if (tab === 'tests') {
                 btnTests.className = "tab-btn px-6 py-3 font-bold text-sm border-b-2 border-brand-600 text-brand-600 transition flex items-center space-x-2 space-x-reverse";
-                btnSubmissions.className = "tab-btn px-6 py-3 font-bold text-sm border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition flex items-center space-x-2 space-x-reverse";
                 viewTests.classList.remove('hidden');
-                viewSubmissions.classList.add('hidden');
+            } else if (tab === 'tax') {
+                btnTax.className = "tab-btn px-6 py-3 font-bold text-sm border-b-2 border-emerald-600 text-emerald-600 transition flex items-center space-x-2 space-x-reverse";
+                viewTax.classList.remove('hidden');
+                initTaxTab();
             }
             lucide.createIcons();
+        }
+
+        // ==========================================
+        // Tax Offices Admin Management
+        // ==========================================
+        let currentTaxData = null;
+
+        function initTaxTab() {
+            const dateInput = document.getElementById('taxFilterDate');
+            if (!dateInput.value) {
+                setTaxDateToday();
+            } else {
+                loadTaxSubmissions();
+            }
+        }
+
+        function setTaxDateToday() {
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            document.getElementById('taxFilterDate').value = `${yyyy}-${mm}-${dd}`;
+            loadTaxSubmissions();
+        }
+
+        async function loadTaxSubmissions() {
+            const date = document.getElementById('taxFilterDate').value;
+            if (!date) return;
+
+            try {
+                const res = await adminFetch(`/api/admin/tax-submissions?date=${date}`);
+                if (!res.ok) throw new Error('فشل جلب تسليمات المأموريات');
+                currentTaxData = await res.json();
+                renderTaxSubmissions(currentTaxData);
+            } catch (err) {
+                console.error(err);
+                document.getElementById('taxSubmissionsTableBody').innerHTML = `
+                    <tr><td colspan="7" class="p-8 text-center text-rose-500 font-bold">فشل الاتصال بجلب بيانات المأموريات</td></tr>
+                `;
+            }
+        }
+
+        function renderTaxSubmissions(data) {
+            document.getElementById('statTaxTotalOffices').innerText = data.totalActiveOffices;
+            document.getElementById('statTaxSubmittedCount').innerText = data.submittedCount;
+            document.getElementById('statTaxMissingCount').innerText = data.missingCount;
+            document.getElementById('statTaxSheetsCount').innerText = data.sheetsCount;
+            document.getElementById('statTaxRowsCount').innerText = data.totalRowsExtracted;
+            document.getElementById('taxTableBadge').innerText = `${data.submissions.length} تسليم`;
+
+            const tbody = document.getElementById('taxSubmissionsTableBody');
+            if (data.submissions.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="p-12 text-center text-slate-400">
+                            <i data-lucide="inbox" class="w-10 h-10 mx-auto mb-2 text-slate-300 stroke-1"></i>
+                            لم يتم تسجيل أي تسليم مأمورية لتاريخ هذا اليوم (${data.date}).
+                        </td>
+                    </tr>
+                `;
+            } else {
+                tbody.innerHTML = data.submissions.map(s => {
+                    const time = new Date(s.submittedAt).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+
+                    const excelBadge = s.hasExcelSheet && s.excelSheetUrl
+                        ? `<div class="space-y-0.5">
+                                <span class="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-bold inline-flex items-center">
+                                    <i data-lucide="file-spreadsheet" class="w-3.5 h-3.5 ml-1"></i> ${s.rowCount} ممول
+                                </span>
+                                <span class="block text-[11px] text-slate-400 truncate max-w-[150px]">${s.originalExcelFileName || 'شيت إكسيل'}</span>
+                           </div>`
+                        : `<span class="px-2.5 py-1 rounded-full bg-slate-100 text-slate-500 text-xs font-semibold">❌ لا يوجد شيت</span>`;
+
+                    return `
+                        <tr class="hover:bg-slate-50 transition">
+                            <td class="p-4 font-bold text-slate-900">${s.taxOfficeName}</td>
+                            <td class="p-4 font-medium text-slate-800">${s.employeeName}</td>
+                            <td class="p-4 font-mono text-xs text-slate-500 font-bold">${s.employeeCode}</td>
+                            <td class="p-4 font-mono text-xs text-slate-600">${time}</td>
+                            <td class="p-4">
+                                <button onclick="previewPhoto('${s.visitPhotoUrl}', '${s.taxOfficeName}', '${s.employeeName}')" class="px-3 py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold transition flex items-center">
+                                    <i data-lucide="image" class="w-3.5 h-3.5 ml-1"></i> معاينة النموذج
+                                </button>
+                            </td>
+                            <td class="p-4">${excelBadge}</td>
+                            <td class="p-4 text-center">
+                                <div class="flex items-center justify-center space-x-2 space-x-reverse">
+                                    ${s.hasExcelSheet && s.excelSheetUrl ? `
+                                        <a href="${s.excelSheetUrl}" download="${s.originalExcelFileName || 'شيت_الممولين.xlsx'}" class="p-1.5 rounded-lg hover:bg-emerald-50 text-slate-500 hover:text-emerald-700 transition" title="تحميل شيت الإكسيل الفردي">
+                                            <i data-lucide="download" class="w-4 h-4"></i>
+                                        </a>
+                                    ` : ''}
+                                    <button onclick="deleteTaxSubmission(${s.id})" class="p-1.5 rounded-lg hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition" title="حذف">
+                                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+
+            // Render Missing Offices Pills
+            const missingBox = document.getElementById('missingOfficesBox');
+            if (data.missingOffices && data.missingOffices.length > 0) {
+                document.getElementById('missingOfficesCountBadge').innerText = data.missingOffices.length;
+                document.getElementById('missingOfficesPills').innerHTML = data.missingOffices.map(o => `
+                    <span class="px-3 py-1.5 rounded-xl bg-white border border-amber-300 text-amber-900 text-xs font-semibold flex items-center shadow-sm">
+                        <i data-lucide="building" class="w-3.5 h-3.5 ml-1 text-amber-600"></i> ${o.name}
+                    </span>
+                `).join('');
+                missingBox.classList.remove('hidden');
+            } else {
+                missingBox.classList.add('hidden');
+            }
+
+            lucide.createIcons();
+        }
+
+        // Lightbox Preview
+        function previewPhoto(url, officeName, empName) {
+            document.getElementById('lightboxImg').src = url;
+            document.getElementById('lightboxTitle').innerText = `نموذج زيارة: ${officeName}`;
+            document.getElementById('lightboxSubtitle').innerText = `القائم بالزيارة: ${empName}`;
+            document.getElementById('lightboxOpenLink').href = url;
+            document.getElementById('photoPreviewModal').classList.remove('hidden');
+            lucide.createIcons();
+        }
+
+        function closePhotoPreview() {
+            document.getElementById('photoPreviewModal').classList.add('hidden');
+        }
+
+        // Delete Tax Submission
+        async function deleteTaxSubmission(id) {
+            if (!confirm('هل أنت متأكد من حذف هذا السجل وملفاته نهائياً؟')) return;
+            try {
+                const res = await adminFetch(`/api/admin/tax-submissions/${id}`, { method: 'DELETE' });
+                if (res.ok) {
+                    loadTaxSubmissions();
+                } else {
+                    alert('فشل حذف السجل');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('حدث خطأ');
+            }
+        }
+
+        // Download Master Excel
+        async function downloadMasterExcel() {
+            const date = document.getElementById('taxFilterDate').value;
+            if (!date) return;
+
+            try {
+                const res = await adminFetch(`/api/admin/tax-submissions/export-excel?date=${date}`);
+                if (!res.ok) throw new Error('فشل تصدير الشيت المجمع');
+                const blob = await res.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `Master_Taxpayers_${date}.xlsx`;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+            } catch (err) {
+                console.error(err);
+                alert('تعذر تحميل الشيت المجمع');
+            }
+        }
+
+        // Download Photos ZIP
+        async function downloadVisitPhotosZip() {
+            const date = document.getElementById('taxFilterDate').value;
+            if (!date) return;
+
+            try {
+                const res = await adminFetch(`/api/admin/tax-submissions/export-photos?date=${date}`);
+                if (!res.ok) throw new Error('فشل تصدير أرشيف الصور');
+                const blob = await res.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `Visit_Forms_${date}.zip`;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+            } catch (err) {
+                console.error(err);
+                alert('تعذر تحميل أرشيف الصور');
+            }
+        }
+
+        // Tax Offices Management Modal & CRUD
+        function openTaxOfficesModal() {
+            document.getElementById('taxOfficesModal').classList.remove('hidden');
+            loadTaxOfficesList();
+            lucide.createIcons();
+        }
+
+        function closeTaxOfficesModal() {
+            document.getElementById('taxOfficesModal').classList.add('hidden');
+        }
+
+        async function loadTaxOfficesList() {
+            try {
+                const res = await adminFetch('/api/admin/tax-offices');
+                if (!res.ok) throw new Error('فشل جلب قائمة المأموريات');
+                const offices = await res.json();
+
+                const tbody = document.getElementById('adminTaxOfficesTableBody');
+                if (offices.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-slate-400">لا توجد مأموريات مسجلة.</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = offices.map(o => `
+                    <tr class="hover:bg-slate-50">
+                        <td class="p-3 font-bold text-slate-900">${o.name}</td>
+                        <td class="p-3 font-mono text-slate-500">${o.code || '-'}</td>
+                        <td class="p-3 text-slate-600">${o.governorate || '-'}</td>
+                        <td class="p-3">
+                            <span class="px-2 py-0.5 rounded-full text-[11px] font-bold ${o.isActive ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-500'}">
+                                ${o.isActive ? 'نشط' : 'معطل'}
+                            </span>
+                        </td>
+                        <td class="p-3 text-center">
+                            <div class="flex items-center justify-center space-x-2 space-x-reverse">
+                                <button onclick="toggleTaxOfficeStatus(${o.id}, ${!o.isActive}, '${o.name}', '${o.code || ''}', '${o.governorate || ''}')" class="px-2 py-1 rounded text-[11px] font-bold ${o.isActive ? 'bg-amber-50 text-amber-700 hover:bg-amber-100' : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100'}">
+                                    ${o.isActive ? 'تعطيل' : 'تفعيل'}
+                                </button>
+                                <button onclick="deleteTaxOffice(${o.id})" class="p-1 text-slate-400 hover:text-rose-600" title="حذف">
+                                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `).join('');
+
+                lucide.createIcons();
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        async function handleAddTaxOffice(e) {
+            e.preventDefault();
+            const name = document.getElementById('newOfficeName').value.trim();
+            const code = document.getElementById('newOfficeCode').value.trim();
+            const gov = document.getElementById('newOfficeGov').value.trim();
+
+            if (!name) return;
+
+            try {
+                const res = await adminFetch('/api/admin/tax-offices', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, code, governorate: gov })
+                });
+
+                if (!res.ok) throw new Error('فشل إضافة المأمورية');
+                document.getElementById('addOfficeForm').reset();
+                loadTaxOfficesList();
+                if (currentTaxData) loadTaxSubmissions();
+            } catch (err) {
+                console.error(err);
+                alert('حدث خطأ أثناء إضافة المأمورية');
+            }
+        }
+
+        async function toggleTaxOfficeStatus(id, newStatus, name, code, gov) {
+            try {
+                const res = await adminFetch(`/api/admin/tax-offices/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, code, governorate: gov, isActive: newStatus })
+                });
+
+                if (res.ok) {
+                    loadTaxOfficesList();
+                    if (currentTaxData) loadTaxSubmissions();
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        async function deleteTaxOffice(id) {
+            if (!confirm('هل أنت متأكد من حذف هذه المأمورية من القائمة؟')) return;
+            try {
+                const res = await adminFetch(`/api/admin/tax-offices/${id}`, { method: 'DELETE' });
+                if (res.ok) {
+                    loadTaxOfficesList();
+                    if (currentTaxData) loadTaxSubmissions();
+                } else {
+                    alert('فشل حذف المأمورية');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('حدث خطأ');
+            }
         }
     </script>
 </body>

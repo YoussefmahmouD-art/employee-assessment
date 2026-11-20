@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تسليم مأمورية وزيارة ميدانية | ضرائب</title>
+    <!-- Google Fonts Cairo -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Cairo', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            800: '#1e40af',
+                            900: '#1e3a8a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Cairo', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between selection:bg-brand-500 selection:text-white">
+
+    <!-- Header Navigation -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+        <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center space-x-3 space-x-reverse">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 flex items-center justify-center text-white shadow-md shadow-emerald-500/20">
+                    <i data-lucide="building-2" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold text-slate-900 leading-tight">بوابة المأموريات والزيارات الميدانية</h1>
+                    <p class="text-xs text-slate-500">تسليم نماذج الزيارة وشيتات الممولين اليومية</p>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-2 space-x-reverse">
+                <a href="/index.html" class="inline-flex items-center text-xs font-semibold px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition">
+                    <i data-lucide="award" class="w-4 h-4 ml-1.5 text-brand-600"></i>
+                    بوابة الاختبارات
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-3xl mx-auto px-4 py-8 flex-1 w-full">
+
+        <!-- Form Card -->
+        <div id="formSection" class="bg-white border border-slate-200 rounded-3xl p-6 sm:p-10 shadow-xl shadow-slate-200/50">
+            
+            <div class="border-b border-slate-100 pb-5 mb-6 text-center">
+                <div class="w-16 h-16 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-3 border border-emerald-100">
+                    <i data-lucide="file-check-2" class="w-8 h-8"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-slate-900">تسجيل زيارة مأمورية ضرائب</h2>
+                <p class="text-xs text-slate-500 mt-1">يرجى اختيار المأمورية ورفع صورة نموذج الزيارة وشيت الممولين بدقة</p>
+            </div>
+
+            <form id="submissionForm" onsubmit="handleSubmit(event)" class="space-y-6">
+
+                <!-- 1. Tax Office Selection -->
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">
+                        مأمورية الضرائب <span class="text-rose-500">*</span>
+                    </label>
+                    <div class="relative">
+                        <select id="taxOfficeSelect" required class="w-full pl-4 pr-10 py-3 rounded-xl border border-slate-300 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 outline-none transition text-sm bg-white font-semibold">
+                            <option value="">جاري تحميل قائمة المأموريات...</option>
+                        </select>
+                        <i data-lucide="landmark" class="w-5 h-5 absolute right-3 top-3.5 text-slate-400 pointer-events-none"></i>
+                    </div>
+                </div>
+
+                <!-- 2. Employee Info -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1.5">
+                            اسم الموظف / المندوب <span class="text-rose-500">*</span>
+                        </label>
+                        <div class="relative">
+                            <input type="text" id="employeeName" required placeholder="مثال: أحمد محمد علي" class="w-full pl-4 pr-10 py-3 rounded-xl border border-slate-300 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 outline-none transition text-sm">
+                            <i data-lucide="user" class="w-5 h-5 absolute right-3 top-3.5 text-slate-400"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1.5">
+                            الرقم الوظيفي <span class="text-rose-500">*</span>
+                        </label>
+                        <div class="relative">
+                            <input type="text" id="employeeCode" required placeholder="مثال: EMP-104" class="w-full pl-4 pr-10 py-3 rounded-xl border border-slate-300 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 outline-none transition text-sm font-mono">
+                            <i data-lucide="badge" class="w-5 h-5 absolute right-3 top-3.5 text-slate-400"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Visit Form Photo Upload -->
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">
+                        صورة نموذج الزيارة (إجباري) <span class="text-rose-500">*</span>
+                    </label>
+                    
+                    <!-- Upload Drop Zone -->
+                    <div id="photoDropZone" onclick="document.getElementById('visitPhotoInput').click()" class="border-2 border-dashed border-slate-300 hover:border-emerald-500 hover:bg-emerald-50/30 rounded-2xl p-6 text-center cursor-pointer transition flex flex-col items-center justify-center space-y-2">
+                        <div class="w-12 h-12 bg-slate-100 text-slate-600 rounded-xl flex items-center justify-center">
+                            <i data-lucide="camera" class="w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <span class="text-sm font-bold text-slate-700">اضغط لرفع صورة النموذج أو التصوير بالكاميرا</span>
+                            <p class="text-xs text-slate-400 mt-0.5">يدعم JPG, PNG (يمكنك التقاط الصورة مباشرة من الهاتف)</p>
+                        </div>
+                    </div>
+
+                    <input type="file" id="visitPhotoInput" accept="image/*" capture="environment" class="hidden" onchange="handlePhotoSelect(event)">
+
+                    <!-- Preview Thumbnail -->
+                    <div id="photoPreviewContainer" class="hidden mt-3 p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
+                        <div class="flex items-center space-x-3 space-x-reverse">
+                            <img id="photoPreviewImg" src="" alt="معاينة" class="w-14 h-14 object-cover rounded-lg border border-slate-200 shadow-sm">
+                            <div>
+                                <span id="photoFileName" class="text-xs font-bold text-slate-800 block truncate max-w-[200px]">صورة النموذج</span>
+                                <span class="text-[11px] text-emerald-600 font-semibold flex items-center mt-0.5">
+                                    <i data-lucide="check-circle" class="w-3.5 h-3.5 ml-1"></i> جاهزة للرفع
+                                </span>
+                            </div>
+                        </div>
+                        <button type="button" onclick="clearPhoto()" class="text-rose-500 hover:text-rose-700 p-2 text-xs font-bold flex items-center">
+                            <i data-lucide="trash-2" class="w-4 h-4 ml-1"></i> حذف
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 4. Excel Sheet Toggle & Upload -->
+                <div class="p-5 bg-slate-50 border border-slate-200 rounded-2xl space-y-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div>
+                            <span class="text-sm font-bold text-slate-900 block">هل لديك شيت بيانات الممولين لهذه المأمورية؟</span>
+                            <span class="text-xs text-slate-500">اختر "نعم" في حالة توفر ملف إكسيل يحتوي على ممولي هذه المأمورية</span>
+                        </div>
+
+                        <!-- Toggle Buttons -->
+                        <div class="flex space-x-2 space-x-reverse shrink-0">
+                            <button type="button" id="btnHasSheetYes" onclick="toggleExcelSection(true)" class="px-5 py-2 rounded-xl text-xs font-bold transition flex items-center border border-slate-300 bg-white text-slate-700 hover:bg-slate-100">
+                                <i data-lucide="check" class="w-3.5 h-3.5 ml-1"></i> نعم، لدي شيت
+                            </button>
+                            <button type="button" id="btnHasSheetNo" onclick="toggleExcelSection(false)" class="px-5 py-2 rounded-xl text-xs font-bold transition flex items-center border border-slate-300 bg-white text-slate-700 hover:bg-slate-100">
+                                <i data-lucide="x" class="w-3.5 h-3.5 ml-1"></i> لا، لا يوجد شيت
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Hidden Excel Upload Zone (Expands when "Yes") -->
+                    <div id="excelUploadSection" class="hidden pt-4 border-t border-slate-200">
+                        <label class="block text-xs font-bold text-slate-700 mb-2 flex items-center">
+                            <i data-lucide="file-spreadsheet" class="w-4 h-4 ml-1.5 text-emerald-600"></i>
+                            شيت بيانات الممولين (.xlsx / .xls)
+                        </label>
+
+                        <div id="excelDropZone" onclick="document.getElementById('excelFileInput').click()" class="border-2 border-dashed border-emerald-300 bg-emerald-50/40 hover:bg-emerald-50 rounded-2xl p-5 text-center cursor-pointer transition flex flex-col items-center justify-center space-y-1">
+                            <i data-lucide="upload-cloud" class="w-7 h-7 text-emerald-600"></i>
+                            <span class="text-xs font-bold text-emerald-900">اضغط هنا لاختيار ملف الإكسيل</span>
+                            <span class="text-[11px] text-emerald-700">امتداد ملفات الإكسيل المدعوم: xlsx, xls</span>
+                        </div>
+
+                        <input type="file" id="excelFileInput" accept=".xlsx, .xls" class="hidden" onchange="handleExcelSelect(event)">
+
+                        <!-- Excel Selected Info -->
+                        <div id="excelSelectedInfo" class="hidden mt-3 p-3 bg-white border border-emerald-200 rounded-xl flex items-center justify-between">
+                            <div class="flex items-center space-x-2 space-x-reverse">
+                                <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center">
+                                    <i data-lucide="file-spreadsheet" class="w-5 h-5"></i>
+                                </div>
+                                <div>
+                                    <span id="excelFileName" class="text-xs font-bold text-slate-800 block truncate max-w-[220px]">شيت الممولين.xlsx</span>
+                                    <span id="excelFileSize" class="text-[11px] text-slate-400">0 KB</span>
+                                </div>
+                            </div>
+                            <button type="button" onclick="clearExcel()" class="text-rose-500 hover:text-rose-700 p-1.5 text-xs font-bold">
+                                <i data-lucide="x" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5. Notes (Optional) -->
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1.5">ملاحظات إضافية عن الزيارة (اختياري)</label>
+                    <textarea id="notesInput" rows="2" placeholder="اكتب أي ملاحظات تتعلق بالزيارة أو حالة المستندات..." class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-500 outline-none text-xs"></textarea>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" id="submitBtn" class="w-full py-4 px-6 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold text-base shadow-lg shadow-emerald-600/25 transition flex items-center justify-center space-x-2 space-x-reverse">
+                    <i data-lucide="send" class="w-5 h-5"></i>
+                    <span>تسليم بيانات المأمورية الآن</span>
+                </button>
+
+            </form>
+        </div>
+
+        <!-- Success Screen (Shown after submit) -->
+        <div id="successSection" class="hidden bg-white border border-slate-200 rounded-3xl p-8 sm:p-12 shadow-xl shadow-slate-200/50 text-center animate-fade-in">
+            <div class="w-20 h-20 bg-emerald-50 text-emerald-600 rounded-3xl flex items-center justify-center mx-auto mb-6 border border-emerald-100 shadow-lg shadow-emerald-500/10">
+                <i data-lucide="check" class="w-10 h-10 stroke-[2.5]"></i>
+            </div>
+
+            <span class="inline-block px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold mb-3">
+                تم التسليم بنجاح
+            </span>
+
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-3">شكراً لك!</h2>
+
+            <p class="text-slate-600 text-sm sm:text-base leading-relaxed mb-2">
+                تم استلام وحفظ نموذج الزيارة وبيانات المأمورية:
+            </p>
+            <div class="inline-block p-3 bg-slate-50 border border-slate-200 rounded-2xl font-bold text-slate-900 text-sm mb-6" id="successOfficeName">
+                -
+            </div>
+
+            <p class="text-xs text-slate-500 mb-8">
+                تم توجيه المستندات لداش بورد الإدارة وسيتم تضمين الشيت في التجميعة اليومية تلقائياً.
+            </p>
+
+            <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                <button onclick="resetSubmissionForm()" class="px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-md transition flex items-center justify-center space-x-2 space-x-reverse">
+                    <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                    <span>تسجيل مأمورية أخرى</span>
+                </button>
+                <a href="/index.html" class="px-6 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-sm transition flex items-center justify-center space-x-2 space-x-reverse">
+                    <i data-lucide="home" class="w-4 h-4"></i>
+                    <span>العودة للرئيسية</span>
+                </a>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500">
+        منصة الخدمات والمأموريات الميدانية &bull; تم الإنشاء والتطوير بواسطة <strong class="font-bold text-slate-800 text-sm">البشمهندس يوسف محمود</strong>
+    </footer>
+
+    <!-- Script -->
+    <script>
+        let hasExcelSheet = false;
+        let selectedPhotoFile = null;
+        let selectedExcelFile = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            loadTaxOffices();
+            toggleExcelSection(false); // default No
+        });
+
+        // 1. Load Tax Offices for Dropdown
+        async function loadTaxOffices() {
+            try {
+                const res = await fetch('/api/tax-offices');
+                if (!res.ok) throw new Error('فشل جلب قائمة المأموريات');
+                const offices = await res.json();
+
+                const select = document.getElementById('taxOfficeSelect');
+                if (offices.length === 0) {
+                    select.innerHTML = '<option value="">لا توجد مأموريات مسجلة حالياً</option>';
+                    return;
+                }
+
+                select.innerHTML = '<option value="">-- اختر مأمورية الضرائب --</option>' +
+                    offices.map(o => `<option value="${o.id}">${o.name} (${o.governorate || 'عام'})</option>`).join('');
+            } catch (err) {
+                console.error(err);
+                document.getElementById('taxOfficeSelect').innerHTML = '<option value="">تعذر تحميل المأموريات</option>';
+            }
+        }
+
+        // 2. Toggle Excel Section
+        function toggleExcelSection(enable) {
+            hasExcelSheet = enable;
+            const btnYes = document.getElementById('btnHasSheetYes');
+            const btnNo = document.getElementById('btnHasSheetNo');
+            const section = document.getElementById('excelUploadSection');
+
+            if (enable) {
+                btnYes.className = "px-5 py-2 rounded-xl text-xs font-bold transition flex items-center border border-emerald-500 bg-emerald-600 text-white shadow-sm";
+                btnNo.className = "px-5 py-2 rounded-xl text-xs font-bold transition flex items-center border border-slate-300 bg-white text-slate-700 hover:bg-slate-100";
+                section.classList.remove('hidden');
+            } else {
+                btnNo.className = "px-5 py-2 rounded-xl text-xs font-bold transition flex items-center border border-slate-600 bg-slate-700 text-white shadow-sm";
+                btnYes.className = "px-5 py-2 rounded-xl text-xs font-bold transition flex items-center border border-slate-300 bg-white text-slate-700 hover:bg-slate-100";
+                section.classList.add('hidden');
+                clearExcel();
+            }
+            lucide.createIcons();
+        }
+
+        // 3. Handle Photo Selection & Preview
+        function handlePhotoSelect(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            selectedPhotoFile = file;
+            document.getElementById('photoFileName').innerText = file.name;
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                document.getElementById('photoPreviewImg').src = event.target.result;
+                document.getElementById('photoPreviewContainer').classList.remove('hidden');
+                document.getElementById('photoDropZone').classList.add('hidden');
+            };
+            reader.readAsDataURL(file);
+            lucide.createIcons();
+        }
+
+        function clearPhoto() {
+            selectedPhotoFile = null;
+            document.getElementById('visitPhotoInput').value = '';
+            document.getElementById('photoPreviewContainer').classList.add('hidden');
+            document.getElementById('photoDropZone').classList.remove('hidden');
+        }
+
+        // 4. Handle Excel Selection
+        function handleExcelSelect(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            selectedExcelFile = file;
+            document.getElementById('excelFileName').innerText = file.name;
+            document.getElementById('excelFileSize').innerText = `${Math.round(file.size / 1024)} KB`;
+            document.getElementById('excelSelectedInfo').classList.remove('hidden');
+            document.getElementById('excelDropZone').classList.add('hidden');
+            lucide.createIcons();
+        }
+
+        function clearExcel() {
+            selectedExcelFile = null;
+            document.getElementById('excelFileInput').value = '';
+            document.getElementById('excelSelectedInfo').classList.add('hidden');
+            document.getElementById('excelDropZone').classList.remove('hidden');
+        }
+
+        // 5. Submit Form
+        async function handleSubmit(e) {
+            e.preventDefault();
+
+            const officeId = document.getElementById('taxOfficeSelect').value;
+            const empName = document.getElementById('employeeName').value.trim();
+            const empCode = document.getElementById('employeeCode').value.trim();
+            const notes = document.getElementById('notesInput').value.trim();
+
+            if (!officeId) {
+                alert('يرجى اختيار مأمورية الضرائب');
+                return;
+            }
+            if (!selectedPhotoFile) {
+                alert('يرجى رفع صورة نموذج الزيارة أولاً');
+                return;
+            }
+            if (hasExcelSheet && !selectedExcelFile) {
+                alert('لقد اخترت أن لديك شيت ممولين، يرجى اختيار ملف الإكسيل أو تغيير الاختيار إلى "لا يوجد شيت"');
+                return;
+            }
+
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `
+                <i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i>
+                <span>جاري رفع البيانات ونموذج الزيارة...</span>
+            `;
+            lucide.createIcons();
+
+            const formData = new FormData();
+            formData.append('taxOfficeId', officeId);
+            formData.append('employeeName', empName);
+            formData.append('employeeCode', empCode);
+            formData.append('notes', notes);
+            formData.append('hasExcelSheet', hasExcelSheet ? 'true' : 'false');
+            formData.append('visitPhoto', selectedPhotoFile);
+            if (hasExcelSheet && selectedExcelFile) {
+                formData.append('excelSheet', selectedExcelFile);
+            }
+
+            try {
+                const res = await fetch('/api/tax-submissions', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!res.ok) {
+                    const err = await res.json();
+                    throw new Error(err.message || 'فشل تسليم البيانات');
+                }
+
+                const data = await res.json();
+
+                // Show Success Screen
+                document.getElementById('formSection').classList.add('hidden');
+                document.getElementById('successSection').classList.remove('hidden');
+                document.getElementById('successOfficeName').innerText = data.taxOfficeName;
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } catch (err) {
+                console.error(err);
+                alert('حدث خطأ: ' + err.message);
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = `
+                    <i data-lucide="send" class="w-5 h-5"></i>
+                    <span>تسليم بيانات المأمورية الآن</span>
+                `;
+                lucide.createIcons();
+            }
+        }
+
+        function resetSubmissionForm() {
+            document.getElementById('submissionForm').reset();
+            clearPhoto();
+            clearExcel();
+            toggleExcelSection(false);
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = `
+                <i data-lucide="send" class="w-5 h-5"></i>
+                <span>تسليم بيانات المأمورية الآن</span>
+            `;
+            document.getElementById('successSection').classList.add('hidden');
+            document.getElementById('formSection').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            lucide.createIcons();
+        }
+    </script>
+</body>
+</html>
